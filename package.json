@@ -19,9 +19,9 @@
   "author": "Prajankya",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/SnappyRobotics/snappy/issues"
+    "url": "https://github.com/SnappyRobotics/SnappyRobotics/issues"
   },
-  "homepage": "https://github.com/SnappyRobotics/snappy#readme",
+  "homepage": "https://github.com/SnappyRobotics/SnappyRobotics#readme",
   "dependencies": {
     "node-red": "^0.16.2"
   }
