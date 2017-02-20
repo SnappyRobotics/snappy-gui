@@ -1,0 +1,30 @@
+{
+  "name": "snappy",
+  "version": "0.0.1",
+  "description": "Snappy Robotics GUI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SnappyRobotics/snappy.git"
+  },
+  "keywords": [
+    "snappy",
+    "robotics",
+    "gui",
+    "nodered"
+  ],
+  "author": {
+    "name": "Prajankya Sonar",
+    "email": "contact@prajankya.me",
+    "url": "https://prajankya.me/"
+  },
+  "author": "Prajankya",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/SnappyRobotics/snappy/issues"
+  },
+  "homepage": "https://github.com/SnappyRobotics/snappy#readme"
+}
