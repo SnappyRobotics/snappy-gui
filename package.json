@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SnappyRobotics/snappy.git"
+    "url": "git+https://github.com/SnappyRobotics/SnappyRobotics.git"
   },
   "keywords": [
     "snappy",
