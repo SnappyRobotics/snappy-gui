@@ -24,5 +24,9 @@
   "homepage": "https://github.com/SnappyRobotics/SnappyRobotics#readme",
   "dependencies": {
     "node-red": "^0.16.2"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-coveralls": "^1.0.1"
   }
 }
