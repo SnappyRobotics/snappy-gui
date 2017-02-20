@@ -16,15 +16,13 @@
     "gui",
     "nodered"
   ],
-  "author": {
-    "name": "Prajankya Sonar",
-    "email": "contact@prajankya.me",
-    "url": "https://prajankya.me/"
-  },
   "author": "Prajankya",
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/SnappyRobotics/snappy/issues"
   },
-  "homepage": "https://github.com/SnappyRobotics/snappy#readme"
+  "homepage": "https://github.com/SnappyRobotics/snappy#readme",
+  "dependencies": {
+    "node-red": "^0.16.2"
+  }
 }
