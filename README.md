@@ -1,2 +1,2 @@
-# snappy
-The meta package container package
+# snappy-gui
+The frontend GUI for snappy core

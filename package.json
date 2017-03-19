@@ -4,7 +4,8 @@
   "description": "Snappy Robotics GUI",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "DEBUG=-reqfast.*,snappy:gui:* nodemon ."
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,11 @@
   },
   "homepage": "https://github.com/SnappyRobotics/snappy-gui#readme",
   "dependencies": {
-    "node-red": "^0.16.2"
+    "ip": "^1.1.5",
+    "netmask": "^1.0.6",
+    "nodemon": "^1.11.0",
+    "req-fast": "^0.2.17",
+    "when": "^3.7.8"
   },
   "devDependencies": {
     "coveralls": "^2.11.16",
