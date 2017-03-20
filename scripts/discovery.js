@@ -73,7 +73,7 @@ var discovery = {
   ping: function(ip, callback) {
     return bindCallback(when.promise(function(resolve, reject) {
       req({
-        uri: "http://" + ip + ":" + PORT + "/info",
+        uri: "http://" + ip + ":" + global.PORT + "/info",
         agent: "",
         headers: {
           'accept': 'application/json',

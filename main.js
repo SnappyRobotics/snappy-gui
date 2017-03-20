@@ -2,16 +2,33 @@
 
 const {
   app,
+  ipc,
   BrowserWindow
 } = require('electron')
 
 const path = require('path')
 const url = require('url')
 
-function createWindow(file, width, height) {
+
+
+
+//--------------------------------SETTINGS--------------------------------
+
+global.PORT = 8000
+
+//------------------------------------------------------------------------
+
+
+
+function createWindow(title, file, width, height) {
   var win = new BrowserWindow({
+    name: title,
+    title: title,
+    frame: true,
+    resizable: true,
     width: width,
-    height: height
+    height: height,
+    show: false
   })
 
   win.loadURL(url.format({
@@ -22,12 +39,13 @@ function createWindow(file, width, height) {
 
   // Chrome developer tools
   win.webContents.openDevTools({
-    detach: true
+    // detach: true
   });
 
   win.on('closed', () => {
     win = null
   })
+
   return win
 }
 
@@ -40,7 +58,14 @@ app.on('window-all-closed', () => {
 let launchWin
 
 function createLaunch() {
-  launchWin = createWindow("discovery.html", 300, 200)
+  launchWin = createWindow("Discovery", "discovery.html", 600, 400)
+  const discover = require(path.join(__dirname, "main_process", 'discover'));
+  launchWin.webContents.on('did-finish-load', function() {
+    setTimeout(function() {
+      launchWin.show();
+      // console.error(Date.now());
+    }, 40);
+  });
 }
 
 app.on('ready', createLaunch)

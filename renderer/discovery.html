@@ -8,21 +8,71 @@
 
 	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
 	<link rel="stylesheet" type="text/css" href="../bower_components/angular-material/angular-material.css">
-	<link rel="stylesheet" type="text/css" href="styles/app.css">
+	<style media="screen">
+		body {
+			font-family: 'Roboto', sans-serif;
+			font-size: 14px;
+			height: 100%;
+			margin: 0px;
+			padding: 0px;
+		}
+
+		.content-container {
+			margin-top: 20px;
+			margin-left: 10px;
+			margin-right: 10px;
+		}
+	</style>
 
 	<script type="text/javascript" src="../bower_components/angular/angular.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-aria/angular-aria.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-material/angular-material.js"></script>
 
-	<script type="text/javascript" src="scripts/index.js"></script>
-	<script type="text/javascript" src="scripts/app/todoController.js"></script>
-	<script type="text/javascript" src="scripts/app/config.js"></script>
-	<script type="text/javascript" src="scripts/components/todoList/todoListDirective.js"></script>
+	<body ng-app="app">
+		<div ng-controller="discoveryController" layout="column">
+			<b>Status:</b>{{status}}
+			<ul>
+				<li ng-repeat="ip in devices">{{ip}}</li>
+			</ul>
+		</div>
+		<script type="text/javascript">
+			const ipc = require('electron').ipcRenderer
 
-	<body>
+			angular
+				.module('app', ['ngMaterial', 'ngAnimate'])
+				.config(['$mdThemingProvider', function($mdThemingProvider) {
+					$mdThemingProvider
+						.theme('docs-dark', 'default')
+						.primaryPalette('yellow')
+						.dark()
+						.foregroundPalette['3'] = 'yellow';
+				}])
+				.controller('discoveryController', ['$scope', function($scope) {
+					$scope.val = "from backend"
 
+					debug("Controller started");
 
+					ipc.send('discovery:start_scanning');
+					$scope.status = "searching..";
+
+					ipc.on("discovery:devices", function(em, devices) {
+						if (debug) {
+							debug("Got :", devices);
+						}
+						$scope.$apply(function() {
+							$scope.devices = devices;
+						})
+					})
+					ipc.on("discovery:scan_done", function(em, devices) {
+						if (Array.isArray(devices)) {
+							$scope.$apply(function() {
+								$scope.status = "Scan complete";
+							})
+						}
+					})
+				}]);
+		</script>
 	</body>
 
 </html>
