@@ -39,6 +39,10 @@
 		<script type="text/javascript">
 			const ipc = require('electron').ipcRenderer
 
+			function debug(s) {
+				console.log(s);
+			}
+
 			angular
 				.module('app', ['ngMaterial', 'ngAnimate'])
 				.config(['$mdThemingProvider', function($mdThemingProvider) {
@@ -58,7 +62,7 @@
 
 					ipc.on("discovery:devices", function(em, devices) {
 						if (debug) {
-							debug("Got :", devices);
+							debug("Got :" + devices);
 						}
 						$scope.$apply(function() {
 							$scope.devices = devices;
