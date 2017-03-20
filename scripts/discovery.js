@@ -30,12 +30,14 @@ var discovery = {
   getRange: function(callback) {
     return bindCallback(when.promise(function(resolve, reject) {
       discovery.ips().then(function(addresses) {
+        var ar = []
         for (var i = 0; i < addresses.length; i++) {
           const Netmask = require('netmask').Netmask;
           var block = new Netmask(addresses[i].address + "/" + addresses[i].netmask)
-          var ar = []
           block.forEach(function(ip, long, index) {
-            ar.push(ip)
+            if (addresses[i].address != ip) { // remove local node..
+              ar.push(ip)
+            }
           })
         }
         resolve(ar)
@@ -50,6 +52,8 @@ var discovery = {
         for (var i = 0; i < range.length; i++) {
           ar.push(discovery.ping(range[i]))
         }
+        ar.push(discovery.ping("127.0.0.1")) //------------ adding localhost
+
         var p = when.all(ar)
         p.done(function(ot) {
           for (var i = 0; i < ot.length; i++) {
@@ -57,6 +61,7 @@ var discovery = {
               retAr.push(ot[i])
             }
           }
+          debug("Scanning complete")
           resolve(retAr)
         }, function(er) {
           debug(er)
