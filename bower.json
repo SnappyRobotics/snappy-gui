@@ -1,0 +1,18 @@
+{
+  "name": "snappy-gui",
+  "homepage": "https://github.com/SnappyRobotics/snappy-gui",
+  "authors": [
+    "prajankya <prajankya@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "LGPLv3",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
