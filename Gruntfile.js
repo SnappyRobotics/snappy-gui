@@ -1,3 +1,5 @@
+"use strict";
+
 var path = require('path')
 
 module.exports = function(grunt) {
@@ -55,11 +57,11 @@ module.exports = function(grunt) {
       }
     }
   });
-  grunt.loadTasks('tasks')
+  //grunt.loadTasks('tasks')
 
   grunt.loadNpmTasks('grunt-contrib-jshint')
-  grunt.loadNpmTasks('grunt-simple-mocha')
-  //grunt.loadNpmTasks('grunt-exec')
+  grunt.loadNpmTasks('grunt-simple-mocha');
+
 
   grunt.registerTask('default', ['test'])
   grunt.registerTask('test', ['jshint', 'simplemocha'])
