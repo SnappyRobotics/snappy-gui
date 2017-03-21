@@ -4,7 +4,7 @@
   "description": "Snappy Robotics GUI",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "grunt test",
     "serve": "DEBUG=-reqfast.*,snappy:gui:* nodemon .",
     "start": "DEBUG=snappy:* electron main.js"
   },
