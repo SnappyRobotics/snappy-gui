@@ -2,9 +2,9 @@
   "name": "snappy-gui",
   "version": "0.0.2",
   "description": "Snappy Robotics GUI",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "grunt simplemocha",
+    "test": "DEBUG=snappy:* grunt test",
     "serve": "DEBUG=-reqfast.*,snappy:gui:* nodemon .",
     "start": "DEBUG=snappy:* electron main.js"
   },
