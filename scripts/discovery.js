@@ -57,8 +57,8 @@ var discovery = {
         var p = when.all(ar)
         p.done(function(ot) {
           for (var i = 0; i < ot.length; i++) {
-            if (ot[i]) {
-              retAr.push(ot[i])
+            if (ot[i].found) {
+              retAr.push(ot[i].ip)
             }
           }
           debug("Scanning complete")
@@ -83,15 +83,24 @@ var discovery = {
       }, function(err, resp) {
         if (err) {
           //  throw err
-          resolve(null)
+          resolve({
+            ip: ip,
+            found: false
+          })
           return
         }
         if (resp.body.snappy) {
           debug("Valid node at :", ip)
-          resolve(ip)
+          resolve({
+            ip: ip,
+            found: true
+          })
         } else {
           debug("Invalid node at :", ip)
-          resolve(null)
+          resolve({
+            ip: ip,
+            found: false
+          })
         }
         //debug(resp)
       })

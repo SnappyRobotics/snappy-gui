@@ -31,7 +31,7 @@
 
 	<body ng-app="app">
 		<div ng-controller="discoveryController" layout="column">
-			<b>Status:</b>{{status}}
+			<b>Status:</b>{{status}}:{{searching}}
 			<ul>
 				<li ng-repeat="ip in devices">{{ip}}</li>
 			</ul>
@@ -66,6 +66,14 @@
 						}
 						$scope.$apply(function() {
 							$scope.devices = devices;
+						})
+					})
+					ipc.on("discovery:searching", function(em, ip) {
+						if (debug) {
+							debug("Searching for :" + ip);
+						}
+						$scope.$apply(function() {
+							$scope.searching = ip;
 						})
 					})
 					ipc.on("discovery:scan_done", function(em, devices) {

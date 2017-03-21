@@ -13,17 +13,18 @@ const when = require('when')
 const discovery = require(path.join(__dirname, "..", "scripts", "discovery.js"))
 
 ipcMain.on('discovery:start_scanning', function(event, arg) {
-  debug("autoscan started", discovery)
+  debug("autoscan started")
   discovery.getRange().then(function(range) {
     var ar = []
     var retAr = []
-    range.push("127.0.0.1") //------------ adding localhost
+    range.unshift("127.0.0.1") //------------ adding localhost to first
     for (var i = 0; i < range.length; i++) {
       var promise = discovery.ping(range[i]);
       promise.done(function(ip) {
-        if (ip) {
-          debug("Found Device at :", ip)
-          retAr.push(ip)
+        event.sender.send("discovery:searching", ip.ip)
+        if (ip.found) {
+          debug("Found Device at :", ip.ip)
+          retAr.push(ip.ip)
           event.sender.send("discovery:devices", retAr)
         }
       })
