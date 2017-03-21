@@ -1,8 +1,10 @@
+"use strict";
+
 const req = require('req-fast')
 const path = require('path')
 const when = require('when')
 const fs = require('fs')
-var os = require('os');
+const os = require('os')
 const bindCallback = require('when/node').bindCallback;
 
 
@@ -11,16 +13,20 @@ const debug = require('debug')("snappy:gui:discovery")
 var discovery = {
   ips: function(callback) {
     return bindCallback(when.promise(function(resolve, reject) {
-      var interfaces = os.networkInterfaces();
-      var addresses = [];
+      var interfaces = os.networkInterfaces()
+      var addresses = []
       for (var k in interfaces) {
-        for (var k2 in interfaces[k]) {
-          var address = interfaces[k][k2];
-          if (address.family === 'IPv4' && !address.internal) {
-            addresses.push({
-              address: address.address,
-              netmask: address.netmask
-            });
+        if (interfaces.hasOwnProperty(k)) {
+          for (var k2 in interfaces[k]) {
+            if (interfaces[k].hasOwnProperty(k2)) {
+              var address = interfaces[k][k2]
+              if (address.family === 'IPv4' && !address.internal) {
+                addresses.push({
+                  address: address.address,
+                  netmask: address.netmask
+                })
+              }
+            }
           }
         }
       }
