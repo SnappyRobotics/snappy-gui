@@ -22,14 +22,6 @@ module.exports = function(grunt) {
         'maxerr': 2,
         'bitwise': true
       },
-      all: [
-        'Gruntfile.js',
-        'main.js',
-        'test/**/*.js',
-        'main_process/**/*.js',
-        'renderer/**/*.js',
-        'scripts/**/*.js'
-      ],
       main_process: {
         files: {
           src: [
@@ -52,16 +44,23 @@ module.exports = function(grunt) {
           src: ['test/**/*.js']
         },
         options: {
+          'mocha': true,
           'expr': true
         }
-      },
+      }
+    },
+    simplemocha: {
+      all: {
+        src: ['test/**/*.js']
+      }
     }
   });
   grunt.loadTasks('tasks')
 
   grunt.loadNpmTasks('grunt-contrib-jshint')
+  grunt.loadNpmTasks('grunt-simple-mocha')
   //grunt.loadNpmTasks('grunt-exec')
 
   grunt.registerTask('default', ['test'])
-  grunt.registerTask('test', ['jshint'])
+  grunt.registerTask('test', ['jshint', 'simplemocha'])
 }

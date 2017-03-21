@@ -4,7 +4,7 @@
   "description": "Snappy Robotics GUI",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test",
+    "test": "grunt simplemocha",
     "serve": "DEBUG=-reqfast.*,snappy:gui:* nodemon .",
     "start": "DEBUG=snappy:* electron main.js"
   },
@@ -38,6 +38,7 @@
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-contrib-nodeunit": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
+    "grunt-simple-mocha": "^0.4.1",
     "mocha": "^3.2.0",
     "mocha-lcov-reporter": "^1.2.0",
     "spectron": "^3.6.0"
