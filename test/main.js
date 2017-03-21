@@ -3,19 +3,27 @@
 const Application = require('spectron').Application
 const assert = require('assert')
 const path = require('path')
-const debug = require('debug')("snappy:gui:test:main");
+var chai = require('chai')
+var chaiAsPromised = require('chai-as-promised')
+
+chai.should()
+chai.use(chaiAsPromised)
+
+const debug = require('debug')("snappy:gui:test:main")
 
 describe('application launch', function() {
   this.timeout(10000)
 
   beforeEach(function() {
-    debug(path.join(__dirname, "..", "main.js"))
-
     this.app = new Application({
       path: './node_modules/.bin/electron',
       args: ['main.js']
     })
     return this.app.start()
+  })
+
+  beforeEach(function() {
+    chaiAsPromised.transferPromiseness = this.app.transferPromiseness
   })
 
   afterEach(function() {
@@ -24,9 +32,14 @@ describe('application launch', function() {
     }
   })
 
-  it('shows an initial window', function() {
-    return this.app.client.getWindowCount().then(function(count) {
-      assert.equal(count, 2)
-    })
+  it('opens a window', function() {
+    return this.app.client.waitUntilWindowLoaded()
+      .getWindowCount().should.eventually.equal(2)
+      .browserWindow.isMinimized().should.eventually.be.false
+      .browserWindow.isDevToolsOpened().should.eventually.be.false
+      .browserWindow.isVisible().should.eventually.be.true
+      .browserWindow.isFocused().should.eventually.be.true
+      .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
+      .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
   })
 })
