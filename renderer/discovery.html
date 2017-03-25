@@ -16,17 +16,38 @@
 
 	<body ng-app="app">
 		<div ng-controller="discoveryController" style="padding:30px;" ng-cloak>
+			<h1> Device auto discovery wizard</h1>
+			<br>
 			<div ng-if="scanning">
 				<md-progress-linear md-mode="indeterminate"></md-progress-linear>
 				<b>{{status}}</b> : {{searching}}
 			</div>
 			<div ng-if="scanning === false">
-				<md-button class="md-raised md-primary" ng-click="start_scanning()">Rescan current Network</md-button>
+				<md-button class="md-raised md-primary" ng-click="start_scanning()">
+					Rescan local network
+					<md-tooltip md-delay="500">
+						Restart the scanning accross current local network
+					</md-tooltip>
+				</md-button>
+
 			</div>
-			<strong>Devices ({{devices.length}}):</strong>
-			<ul>
-				<li ng-repeat="ip in devices">{{ip}}</li>
-			</ul>
+			<md-button class="md-raised md-primary" ng-click="start_locally()">
+				Start core locally
+				<md-tooltip md-delay="500">
+					Start the backend core to run program from this system
+				</md-tooltip>
+			</md-button>
+
+			<md-list flex>
+				<md-subheader class="md-no-sticky">Devices ({{devices.length}}):</md-subheader>
+				<md-list-item ng-repeat="ip in devices" layout="row">
+					<h3>{{ip}}</h3>
+					<span flex></span>
+					<md-button class="md-raised" ng-click="connect(ip)">
+						Connect
+					</md-button>
+				</md-list-item>
+			</md-list>
 		</div>
 		<script type="text/javascript">
 			const ipc = require('electron').ipcRenderer
