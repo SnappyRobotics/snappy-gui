@@ -47,9 +47,9 @@ function createWindow(title, file, width, height) {
   }))
 
   // Chrome developer tools
-  win.webContents.openDevTools({
-    // detach: true
-  });
+  // win.webContents.openDevTools({
+  //   // detach: true
+  // });
 
   win.on('closed', () => {
     win = null

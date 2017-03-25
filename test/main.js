@@ -34,7 +34,7 @@ describe('application launch', function() {
 
   it('opens a window', function() {
     return this.app.client.waitUntilWindowLoaded()
-      .getWindowCount().should.eventually.equal(2)
+      .getWindowCount().should.eventually.equal(1)
       .browserWindow.isMinimized().should.eventually.be.false
       .browserWindow.isDevToolsOpened().should.eventually.be.false
       .browserWindow.isVisible().should.eventually.be.true

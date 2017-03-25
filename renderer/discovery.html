@@ -8,21 +8,6 @@
 
 	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
 	<link rel="stylesheet" type="text/css" href="../bower_components/angular-material/angular-material.css">
-	<style media="screen">
-		body {
-			font-family: 'Roboto', sans-serif;
-			font-size: 14px;
-			height: 100%;
-			margin: 0px;
-			padding: 0px;
-		}
-
-		.content-container {
-			margin-top: 20px;
-			margin-left: 10px;
-			margin-right: 10px;
-		}
-	</style>
 
 	<script type="text/javascript" src="../bower_components/angular/angular.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-aria/angular-aria.js"></script>
@@ -30,8 +15,15 @@
 	<script type="text/javascript" src="../bower_components/angular-material/angular-material.js"></script>
 
 	<body ng-app="app">
-		<div ng-controller="discoveryController" layout="column">
-			<b>Status:</b>{{status}}:{{searching}}
+		<div ng-controller="discoveryController" style="padding:30px;" ng-cloak>
+			<div ng-if="scanning">
+				<md-progress-linear md-mode="indeterminate"></md-progress-linear>
+				<b>{{status}}</b> : {{searching}}
+			</div>
+			<div ng-if="scanning === false">
+				<md-button class="md-raised md-primary" ng-click="start_scanning()">Rescan current Network</md-button>
+			</div>
+			<strong>Devices ({{devices.length}}):</strong>
 			<ul>
 				<li ng-repeat="ip in devices">{{ip}}</li>
 			</ul>
@@ -57,32 +49,45 @@
 
 					debug("Controller started");
 
-					ipc.send('discovery:start_scanning');
-					$scope.status = "searching..";
+					$scope.start_scanning = function() {
+						ipc.send('discovery:start_scanning');
+						$scope.status = "searching..";
+						$scope.scanning = true;
+						$scope.devices = [];
 
-					ipc.on("discovery:devices", function(em, devices) {
-						if (debug) {
-							debug("Got :" + devices);
-						}
-						$scope.$apply(function() {
-							$scope.devices = devices;
-						})
-					})
-					ipc.on("discovery:searching", function(em, ip) {
-						if (debug) {
-							debug("Searching for :" + ip);
-						}
-						$scope.$apply(function() {
-							$scope.searching = ip;
-						})
-					})
-					ipc.on("discovery:scan_done", function(em, devices) {
-						if (Array.isArray(devices)) {
+						ipc.on("discovery:devices", function(em, devices) {
+							if (debug) {
+								debug("Got :" + devices);
+							}
 							$scope.$apply(function() {
-								$scope.status = "Scan complete";
+								$scope.devices = devices;
 							})
-						}
-					})
+						})
+						ipc.on("discovery:searching", function(em, ip) {
+							if (debug) {
+								debug("Searching for :" + ip);
+							}
+							$scope.$apply(function() {
+								$scope.searching = ip;
+							})
+						})
+						ipc.on("discovery:scan_done", function(em, devices) {
+							if (Array.isArray(devices)) {
+								$scope.$apply(function() {
+									$scope.status = "Scan complete";
+									$scope.scanning = false;
+									$scope.devices = devices;
+								})
+							} else {
+								$scope.$apply(function() {
+									$scope.status = "Scan complete";
+									$scope.devices = []
+								});
+							}
+						})
+					}
+
+					$scope.start_scanning()
 				}]);
 		</script>
 	</body>
