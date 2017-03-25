@@ -31,7 +31,7 @@
 				</md-button>
 
 			</div>
-			<md-button class="md-raised md-primary" ng-click="start_locally()">
+			<md-button class="md-raised md-primary" ng-click="start_core()">
 				Start core locally
 				<md-tooltip md-delay="500">
 					Start the backend core to run program from this system
@@ -69,6 +69,10 @@
 					$scope.val = "from backend"
 
 					debug("Controller started");
+
+					$scope.start_core = function() {
+						ipc.send('start_core');
+					}
 
 					$scope.start_scanning = function() {
 						ipc.send('discovery:start_scanning');

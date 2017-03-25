@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "DEBUG=snappy:* grunt test",
-    "serve": "DEBUG=-reqfast.*,snappy:gui:* nodemon .",
+    "serve": "DEBUG=-reqfast.*,snappy:* nodemon .",
     "start": "DEBUG=snappy:* electron main.js"
   },
   "repository": {
@@ -29,6 +29,7 @@
     "netmask": "^1.0.6",
     "nodemon": "^1.11.0",
     "req-fast": "^0.2.17",
+    "snappy-core": "^0.1.103",
     "when": "^3.7.8"
   },
   "devDependencies": {
