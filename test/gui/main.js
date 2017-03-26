@@ -45,7 +45,17 @@ describe('Snappy GUI', function() {
       .getText('#devices_count').should.eventually.equal('0')
   })
 
-  describe('Running local core', function() {
+  it('Running local core', function() {
+    return app.client.waitUntilWindowLoaded()
+      .getMainProcessLogs().then(debug)
+      .getRenderProcessLogs().then(debug)
+      .click("#localBtn")
+      .pause(1000)
+      .windowByIndex(0)
+      .waitUntilTextExists('#status_txt', 'Connected', 60000)
+  })
+
+  describe('connecting to existing local core', function() {
     before(function() {
       core.clean().then(function() { //Clean previous config
         return core.start() //start the core
