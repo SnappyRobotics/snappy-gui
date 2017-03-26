@@ -39,7 +39,8 @@
 			</md-button>
 
 			<md-list flex>
-				<md-subheader class="md-no-sticky">Devices ({{devices.length}}):</md-subheader>
+				<md-subheader class="md-no-sticky">Devices (
+					<span id="devices_count">{{devices.length}}</span>):</md-subheader>
 				<md-list-item ng-repeat="ip in devices" layout="row">
 					<h3>{{ip}}</h3>
 					<span flex></span>

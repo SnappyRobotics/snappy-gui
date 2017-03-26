@@ -4,15 +4,15 @@ const url = require('url')
 const path = require('path')
 const debug = require('debug')("snappy:gui:launchers")
 
-
-const app = global.snappy_gui.app;
-const ipcMain = global.snappy_gui.ipcMain;
-const BrowserWindow = global.snappy_gui.BrowserWindow;
+const {
+  app,
+  ipcMain,
+  BrowserWindow
+} = require('electron')
 
 var launchers = {
   init: function() {
     var that = launchers
-    debug(require('electron').app)
 
     that.app = app
     that.app.on('window-all-closed', () => {
@@ -65,6 +65,8 @@ var launchers = {
 
     ipcMain.on('start_core', function(event, arg) {
       global.snappy_gui.core = require('snappy-core')
+
+      global.snappy_gui.core.start()
 
       setTimeout(function() {
         debug("Calling connect core to local core")

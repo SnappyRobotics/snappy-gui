@@ -1,8 +1,10 @@
 'use strict';
 
-const app = global.snappy_gui.app;
-const ipcMain = global.snappy_gui.ipcMain;
-const BrowserWindow = global.snappy_gui.BrowserWindow;
+const {
+  app,
+  ipcMain,
+  BrowserWindow
+} = require('electron')
 
 const debug = require('debug')("snappy:gui:discover")
 

@@ -20,29 +20,6 @@ debug("\t\t\t\t    " + global.snappy_gui.package.description)
 debug("\t\t\t\t\t" + global.snappy_gui.package.version)
 debug("==========================================================================")
 
-debug(require('electron'))
-/*global.snappy_gui.app = require('electron-prebuilt').app;
-global.snappy_gui.ipcMain = require('electron').ipcMain;
-global.snappy_gui.BrowserWindow = require('electron').BrowserWindow;
-*/
-/*
-debug(require('module').globalPaths);
-debug(require("electron"));
+const launchers = require(path.join(__dirname, 'scripts', 'launchers'))
 
-const app = require("electron").app;
-
-debug(app)
-
-if (!app) {
-  debug("No app found")
-  const app = require('app');
-
-  debug(app);
-}
-
-debug(app);
-//debug(require('app'));
-*/
-//const launchers = require(path.join(__dirname, 'scripts', 'launchers'))
-
-//launchers.init()
+launchers.init()

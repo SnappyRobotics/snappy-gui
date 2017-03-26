@@ -53,7 +53,7 @@ module.exports = function(grunt) {
     },
     simplemocha: {
       all: {
-        src: ['test/global-setup.js']
+        src: ['test/**/*.js']
       }
     }
   });

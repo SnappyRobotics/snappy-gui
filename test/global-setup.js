@@ -1,10 +1,12 @@
 "use strict";
 
-var Application = require('../main.js').Application
+var Application = require('spectron').Application
 var assert = require('assert')
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 var path = require('path')
+
+const debug = require('debug')("snappy:gui:test:global-setup")
 
 global.before(function() {
   chai.should()
@@ -33,8 +35,14 @@ exports.startApplication = function(options) {
     options.startTimeout = 30000
   }
 
+  debug("Options:", options)
+
   var app = new Application(options)
+
+  debug("starting app")
+
   return app.start().then(function() {
+    debug("started app")
     assert.equal(app.isRunning(), true)
     chaiAsPromised.transferPromiseness = app.transferPromiseness
     return app

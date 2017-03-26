@@ -8,25 +8,26 @@ var it = global.it
 var beforeEach = global.beforeEach
 var afterEach = global.afterEach
 
+const debug = require('debug')("snappy:gui:test:main")
 
-describe('example application launch', function() {
+describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
 
   var app = null
 
-  beforeEach(function() {
+  before(function() {
     return helpers.startApplication({
-      args: [path.join(__dirname, 'fixtures', 'example')]
+      args: [path.join(__dirname, '..', '..', 'main.js')]
     }).then(function(startedApp) {
       app = startedApp
     })
   })
 
-  afterEach(function() {
+  after(function() {
     return helpers.stopApplication(app)
   })
 
-  it('opens a window', function() {
+  it('opens discovery window with no clients', function() {
     return app.client.waitUntilWindowLoaded()
       .browserWindow.focus()
       .getWindowCount().should.eventually.equal(1)
@@ -36,27 +37,25 @@ describe('example application launch', function() {
       .browserWindow.isFocused().should.eventually.be.true
       .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
       .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
+      .browserWindow.getTitle().should.eventually.be.equal("Discovery")
+      .getText('#devices_count').should.eventually.equal('0')
   })
 
-  describe('when the make larger button is clicked', function() {
-    it('increases the window height and width by 10 pixels', function() {
+  describe('Local core', function() {
+    it('click button to start core locally', function() {
       return app.client.waitUntilWindowLoaded()
-        .browserWindow.getBounds().should.eventually.have.property('width', 800)
-        .browserWindow.getBounds().should.eventually.have.property('height', 400)
-        .click('.btn-make-bigger')
-        .browserWindow.getBounds().should.eventually.have.property('width', 810)
-        .browserWindow.getBounds().should.eventually.have.property('height', 410)
+        .click('#localBtn')
+        .getMainProcessLogs().then(function(logs) {
+          logs.forEach(function(log) {
+            // debug("Main Process :", log)
+          })
+        })
+        .getRenderProcessLogs().then(function(logs) {
+          logs.forEach(function(log) {
+            // debug("Renderer Process :", log.message)
+          })
+        })
     })
   })
 
-  describe('when the make smaller button is clicked', function() {
-    it('decreases the window height and width by 10 pixels', function() {
-      return app.client.waitUntilWindowLoaded()
-        .browserWindow.getBounds().should.eventually.have.property('width', 800)
-        .browserWindow.getBounds().should.eventually.have.property('height', 400)
-        .click('.btn-make-smaller')
-        .browserWindow.getBounds().should.eventually.have.property('width', 790)
-        .browserWindow.getBounds().should.eventually.have.property('height', 390)
-    })
-  })
 })
