@@ -51,10 +51,6 @@ var discovery = {
             if (addresses[i].address != ip) { // remove local node..
               ar.push(ip)
             }
-            if (process.env.CI && addresses[i].address == ip) {
-              debug("Detected CI : ", process.env.CI)
-              ar.push(ip)
-            }
           })
         }
         resolve(ar)

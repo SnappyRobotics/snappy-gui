@@ -10,9 +10,12 @@ var beforeEach = global.beforeEach
 var afterEach = global.afterEach
 
 const debug = require('debug')("snappy:gui:test:main")
+const core = require('snappy-core')
 
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
+
+  process.env.CI = true
 
   var app = null
 
@@ -42,10 +45,18 @@ describe('Snappy GUI', function() {
       .getText('#devices_count').should.eventually.equal('0')
   })
 
-  describe('Local core', function() {
-    it('click button to start core locally', function() {
+  describe('Running local core', function() {
+    before(function() {
+      core.clean().then(function() { //Clean previous config
+        return core.start() //start the core
+      })
+    })
+    after(function() {
+      return core.stop()
+    })
+
+    it('waiting for scanning to complete', function() {
       return app.client.waitUntilWindowLoaded()
-        .click('#localBtn')
         .getMainProcessLogs().then(function(logs) {
           logs.forEach(function(log) {
             debug("Main Process :", log)
@@ -56,65 +67,32 @@ describe('Snappy GUI', function() {
             debug("Renderer Process :", log.message)
           })
         })
-    })
-  })
-
-  describe('separate local core', function() {
-    const core = require('snappy-core')
-
-    it('check the devices to be 0 without any server', function() {
-      return app.client.waitUntilWindowLoaded()
         .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
-        .getText('#devices_count').should.eventually.equal('0')
+        .getText('#devices_count').should.eventually.equal('1')
+        .click(".connectBtn")
+        .pause(100) // for next window to come up
+        .windowByIndex(1)
+        .waitUntilTextExists('#status_txt', 'Connected', 60000)
     })
 
-    describe('local running core, with Connecting progress', function() {
-      before(function() {
-        return core.start() //start the core
-      })
-      after(function() {
-        return core.stop()
-      })
-      it('check the devices to be 1 with a on running server', function() {
-        return app.client.waitUntilWindowLoaded()
-          .getMainProcessLogs().then(function(logs) {
-            logs.forEach(function(log) {
-              debug("Main Process :", log)
-            })
+    it('click without waiting for scanning to complete', function() {
+      return app.client.waitUntilWindowLoaded()
+        .getMainProcessLogs().then(function(logs) {
+          logs.forEach(function(log) {
+            debug("Main Process :", log)
           })
-          .getRenderProcessLogs().then(function(logs) {
-            logs.forEach(function(log) {
-              debug("Renderer Process :", log.message)
-            })
+        })
+        .getRenderProcessLogs().then(function(logs) {
+          logs.forEach(function(log) {
+            debug("Renderer Process :", log.message)
           })
-          .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
-          .pause(100) // for next window to come up
-          .getText('#devices_count').should.eventually.equal('1')
-          .click(".connectBtn")
-          .pause(100) // for next window to come up
-          .windowByIndex(1)
-          .waitUntilTextExists('#status_txt', 'Connected', 60000)
-      })
-
-      it('press connect as soon as device detected', function() {
-        return app.client.waitUntilWindowLoaded()
-          .getMainProcessLogs().then(function(logs) {
-            logs.forEach(function(log) {
-              debug("Main Process :", log)
-            })
-          })
-          .getRenderProcessLogs().then(function(logs) {
-            logs.forEach(function(log) {
-              debug("Renderer Process :", log.message)
-            })
-          })
-          .getText('#devices_count').should.eventually.equal('1')
-          .pause(100) // for next window to come up
-          .click(".connectBtn")
-          .pause(100) // for next window to come up
-          .windowByIndex(1)
-          .waitUntilTextExists('#status_txt', 'Connected', 60000)
-      })
+        })
+        .getText('#devices_count').should.eventually.equal('1')
+        .pause(100) // for next window to come up
+        .click(".connectBtn")
+        .pause(100) // for next window to come up
+        .windowByIndex(1)
+        .waitUntilTextExists('#status_txt', 'Connected', 60000)
     })
   })
 })
