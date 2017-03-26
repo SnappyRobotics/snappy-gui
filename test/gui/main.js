@@ -63,7 +63,7 @@ describe('Snappy GUI', function() {
 
     it('check the devices to be 0 without any server', function() {
       return app.client.waitUntilWindowLoaded()
-        .waitUntilTextExists('#status_txt', 'Scan complete')
+        .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
         .getText('#devices_count').should.eventually.equal('0')
     })
 
