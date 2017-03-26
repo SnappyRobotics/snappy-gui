@@ -66,6 +66,8 @@ var launchers = {
     ipcMain.on('start_core', function(event, arg) {
       global.snappy_gui.core = require('snappy-core')
 
+      global.snappy_gui.core.start()
+
       setTimeout(function() {
         debug("Calling connect core to local core")
         ipcMain.emit("connect_core", "127.0.0.1")

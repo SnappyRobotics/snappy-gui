@@ -23,7 +23,7 @@
 				<b>{{status}}</b> : {{searching}}
 			</div>
 			<div ng-if="scanning === false">
-				<md-button class="md-raised md-primary" ng-click="start_scanning()">
+				<md-button id="rescanBtn" class="md-raised md-primary" ng-click="start_scanning()">
 					Rescan local network
 					<md-tooltip md-delay="500">
 						Restart the scanning accross all the networks this system is connected to
@@ -31,7 +31,7 @@
 				</md-button>
 
 			</div>
-			<md-button class="md-raised md-primary" ng-click="start_core()">
+			<md-button id="localBtn" class="md-raised md-primary" ng-click="start_core()">
 				Start core locally
 				<md-tooltip md-delay="500">
 					Start the backend core to run program from this system
@@ -39,7 +39,8 @@
 			</md-button>
 
 			<md-list flex>
-				<md-subheader class="md-no-sticky">Devices ({{devices.length}}):</md-subheader>
+				<md-subheader class="md-no-sticky">Devices (
+					<span id="devices_count">{{devices.length}}</span>):</md-subheader>
 				<md-list-item ng-repeat="ip in devices" layout="row">
 					<h3>{{ip}}</h3>
 					<span flex></span>
