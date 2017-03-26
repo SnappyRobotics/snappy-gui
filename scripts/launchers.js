@@ -44,7 +44,7 @@ var launchers = {
       height: 400,
       webPreferences: {
         nodeIntegration: false,
-        preload: path.join(__dirname, "preload.js")
+        preload: path.join(__dirname, '..', 'renderer', "preload.js")
       },
       show: false
     })
@@ -71,18 +71,15 @@ var launchers = {
       }, 40)
     })
 
-    ipcMain.on('start_core', function(event, arg) {
-      global.snappy_gui.core = require('snappy-core')
-
-      global.snappy_gui.core.start().then(function() {
-        debug("Calling connect core to local core")
-        ipcMain.emit("connect_core", "127.0.0.1")
-      })
-    })
 
     ipcMain.on('connect_core', function(event, arg) {
-      if (!arg) {
-        arg = '127.0.0.1'
+      if (arg == '127.0.0.1') {
+        global.snappy_gui.core = require('snappy-core')
+
+        global.snappy_gui.core.start().then(function() {
+          debug("Calling connect core to local core")
+
+        })
       }
 
       debug("Connecting to IP:", arg)
@@ -107,24 +104,13 @@ var launchers = {
     that.myWin.setMenuBarVisibility(false)
     that.myWin.setTitle("Connecting")
 
-
-
-
-    that.myWin.loadURL(url.format({
-      pathname: path.join(__dirname, '..', 'renderer', 'progress_connecting.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
-
-    that.myWin.webContents.on('did-finish-load', function() {
-      setTimeout(function() {
-        //    that.core_view()
-      }, 5000)
-    })
-
     ipcMain.on('cancel_loading_core', function(event, arg) {
       that.quit()
     })
+
+    setTimeout(function() {
+      that.core_view()
+    }, 2000);
   },
   core_view: function() {
     var that = launchers
@@ -153,12 +139,11 @@ var launchers = {
     debug(u)
     that.myWin.loadURL(u)
 
-    debug('Loading')
-
     that.myWin.webContents.on('did-finish-load', function() {
       debug('Loaded content')
-      that.myWin.show()
     })
+
+    debug('Loading')
   }
 }
 
