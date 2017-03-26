@@ -13,25 +13,30 @@ const debug = require('debug')("snappy:gui:discovery")
 var discovery = {
   ips: function(callback) {
     return bindCallback(when.promise(function(resolve, reject) {
-      var interfaces = os.networkInterfaces()
-      var addresses = []
-      for (var k in interfaces) {
-        if (interfaces.hasOwnProperty(k)) {
-          for (var k2 in interfaces[k]) {
-            if (interfaces[k].hasOwnProperty(k2)) {
-              var address = interfaces[k][k2]
-              if (address.family === 'IPv4' && !address.internal) {
-                addresses.push({
-                  address: address.address,
-                  netmask: address.netmask
-                })
+      if (process.env.CI) {
+        debug("Detected CI : ", process.env.CI)
+        resolve([])
+      } else {
+        var interfaces = os.networkInterfaces()
+        var addresses = []
+        for (var k in interfaces) {
+          if (interfaces.hasOwnProperty(k)) {
+            for (var k2 in interfaces[k]) {
+              if (interfaces[k].hasOwnProperty(k2)) {
+                var address = interfaces[k][k2]
+                if (address.family === 'IPv4' && !address.internal) {
+                  addresses.push({
+                    address: address.address,
+                    netmask: address.netmask
+                  })
+                }
               }
             }
           }
         }
+        debug("Network Interfaces :", addresses)
+        resolve(addresses)
       }
-      debug("Network Interfaces :", addresses)
-      resolve(addresses)
     }), callback)
   },
   getRange: function(callback) {
