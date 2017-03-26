@@ -66,12 +66,14 @@
 						.foregroundPalette['3'] = 'yellow';
 				}])
 				.controller('discoveryController', ['$scope', function($scope) {
-					$scope.val = "from backend"
-
 					debug("Controller started");
 
 					$scope.start_core = function() {
 						ipc.send('start_core');
+					}
+
+					$scope.connect = function(ip) {
+						ipc.send('connect_core', ip);
 					}
 
 					$scope.start_scanning = function() {

@@ -12,6 +12,8 @@ const path = require('path')
 const when = require('when')
 const discovery = require(path.join(__dirname, "..", "scripts", "discovery.js"))
 
+var send = true;
+
 ipcMain.on('discovery:start_scanning', function(event, arg) {
   debug("autoscan started")
   discovery.getRange().then(function(range) {
@@ -21,11 +23,15 @@ ipcMain.on('discovery:start_scanning', function(event, arg) {
     for (var i = 0; i < range.length; i++) {
       var promise = discovery.ping(range[i]);
       promise.done(function(ip) {
-        event.sender.send("discovery:searching", ip.ip)
+        if (send) {
+          event.sender.send("discovery:searching", ip.ip)
+        }
         if (ip.found) {
           debug("Found Device at :", ip.ip)
           retAr.push(ip.ip)
-          event.sender.send("discovery:devices", retAr)
+          if (send) {
+            event.sender.send("discovery:devices", retAr)
+          }
         }
       })
       ar.push(promise)
@@ -34,10 +40,19 @@ ipcMain.on('discovery:start_scanning', function(event, arg) {
     var p = when.all(ar)
     p.done(function(ot) {
       debug("Scanning complete")
-      event.sender.send("discovery:scan_done", retAr)
+      if (send) {
+        event.sender.send("discovery:scan_done", retAr)
+      }
     }, function(er) {
       debug(er)
-      event.sender.send("discovery:scan_done", er)
+      if (send) {
+        event.sender.send("discovery:scan_done", er)
+      }
     })
   })
+})
+
+
+ipcMain.on('connect_core', function(event, arg) {
+  send = false;
 })

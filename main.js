@@ -1,17 +1,13 @@
 "use strict";
 
-const {
-  app,
-  ipcMain,
-  BrowserWindow
-} = require('electron')
 
 const path = require('path')
-const url = require('url')
+
 const fs = require('fs')
-const discovery = require(path.join(__dirname, 'scripts', 'discovery'))
 
 const debug = require('debug')("snappy:gui:index")
+
+global.snappy_gui = {}
 
 //--------------------------------SETTINGS--------------------------------
 
@@ -26,9 +22,11 @@ debug("\t\t\t\t    " + global.snappy_gui.package.description)
 debug("\t\t\t\t\t" + global.snappy_gui.package.version)
 debug("==========================================================================")
 
+const launchers = require(path.join(__dirname, 'scripts', 'launchers'))
 
+launchers.init()
 
-
+/*
 function createWindow(title, file, width, height) {
   var win = new BrowserWindow({
     name: title,
@@ -58,14 +56,6 @@ function createWindow(title, file, width, height) {
   return win
 }
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-})
-
-let launchWin
-
 function createLaunch() {
   launchWin = createWindow("Discovery", "discovery.html", 600, 400)
   const discover = require(path.join(__dirname, "main_process", 'discover'));
@@ -86,5 +76,21 @@ app.on('activate', () => {
 
 
 ipcMain.on('start_core', function(event, arg) {
-  global.core = require('snappy-core');
+  global.snappy_gui.core = require('snappy-core')
+  //global.snappy_gui.core.then(function () {
+  setTimeout(function() {
+    debug("Calling connect core to local core")
+    ipcMain.emit("connect_core", "127.0.0.1")
+  }, 100)
+  //})
 })
+
+ipcMain.on('connect_core', function(event, arg) {
+  global.snappy_gui.client_IP = arg
+  progress = createWindow("Loading", "progress.html", 150, 100)
+  setTimeout(function() {
+    progress.show();
+    launchWin.close()
+  }, 50)
+})
+*/

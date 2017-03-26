@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Loading..</title>
+	</head>
+
+	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
+	<link rel="stylesheet" type="text/css" href="../bower_components/angular-material/angular-material.css">
+
+	<script type="text/javascript" src="../bower_components/angular/angular.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-aria/angular-aria.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-material/angular-material.js"></script>
+
+	<body ng-app="app">
+		<div ng-controller="progressController" layout="column" layout-align="center center" style="padding:10px" ng-cloak>
+			<md-progress-circular md-mode="indeterminate"></md-progress-circular>
+			Connecting ....
+		</div>
+		<script type="text/javascript">
+			const ipc = require('electron').ipcRenderer
+
+			function debug(s) {
+				console.log(s);
+			}
+
+			angular
+				.module('app', ['ngMaterial', 'ngAnimate'])
+				.config(['$mdThemingProvider', function($mdThemingProvider) {
+					$mdThemingProvider
+						.theme('docs-dark', 'default')
+						.primaryPalette('yellow')
+						.dark()
+						.foregroundPalette['3'] = 'yellow';
+				}])
+				.controller('progressController', ['$scope', function($scope) {
+					debug("Controller started");
+				}]);
+		</script>
+	</body>
+
+</html>
