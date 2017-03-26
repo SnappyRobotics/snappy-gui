@@ -35,14 +35,14 @@ exports.startApplication = function(options) {
     options.startTimeout = 30000
   }
 
-  debug("Options:", options)
+  //debug("Options:", options)
 
   var app = new Application(options)
 
-  debug("starting app")
+  //debug("starting app")
 
   return app.start().then(function() {
-    debug("started app")
+    //debug("started app")
     assert.equal(app.isRunning(), true)
     chaiAsPromised.transferPromiseness = app.transferPromiseness
     return app

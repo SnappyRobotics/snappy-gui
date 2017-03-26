@@ -72,10 +72,13 @@ describe('Snappy GUI', function() {
       before(function() {
         return core.start() //start the core
       })
-
+      after(function() {
+        return core.stop()
+      })
       it('check the devices to be 1 with a on running server', function() {
         return app.client.waitUntilWindowLoaded()
           .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
+          .pause(100) // for next window to come up
           .getText('#devices_count').should.eventually.equal('1')
           .click(".connectBtn")
           .pause(100) // for next window to come up
@@ -86,6 +89,7 @@ describe('Snappy GUI', function() {
       it('press connect as soon as device detected', function() {
         return app.client.waitUntilWindowLoaded()
           .getText('#devices_count').should.eventually.equal('1')
+          .pause(100) // for next window to come up
           .click(".connectBtn")
           .pause(100) // for next window to come up
           .windowByIndex(1)
