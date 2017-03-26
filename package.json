@@ -29,7 +29,7 @@
     "netmask": "^1.0.6",
     "nodemon": "^1.11.0",
     "req-fast": "^0.2.17",
-    "snappy-core": "^0.1.103",
+    "snappy-core": "github:snappyrobotics/snappy-core",
     "when": "^3.7.8"
   },
   "devDependencies": {
