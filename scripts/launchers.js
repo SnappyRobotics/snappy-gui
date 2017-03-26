@@ -11,19 +11,23 @@ const {
 } = require('electron')
 
 var launchers = {
+  quit: function() {
+    var that = launchers
+    if (process.platform !== 'darwin') {
+      that.app.quit()
+    }
+  },
   init: function() {
     var that = launchers
 
     that.app = app
     that.app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
-        that.app.quit()
-      }
+      that.quit()
     })
 
     that.app.on('ready', that.discovery)
     that.app.on('activate', () => {
-      if (that.discoveryWin === null) {
+      if (that.myWin === null) {
         that.discovery()
       }
     })
@@ -31,17 +35,21 @@ var launchers = {
   discovery: function() {
     var that = launchers
 
-    that.discoveryWin = new BrowserWindow({
+    that.myWin = new BrowserWindow({
       name: "Discovery",
       title: "Discovery",
       frame: true,
       resizable: true,
       width: 600,
       height: 400,
+      webPreferences: {
+        nodeIntegration: false,
+        preload: path.join(__dirname, "preload.js")
+      },
       show: false
     })
 
-    that.discoveryWin.loadURL(url.format({
+    that.myWin.loadURL(url.format({
       pathname: path.join(__dirname, '..', 'renderer', 'discovery.html'),
       protocol: 'file:',
       slashes: true
@@ -51,15 +59,15 @@ var launchers = {
     // win.webContents.openDevTools({
     //   // detach: true
     // });
-    that.discoveryWin.on('closed', () => {
-      that.discoveryWin = null
+    that.myWin.on('closed', () => {
+      that.quit()
     })
 
     const discover = require(path.join(__dirname, "..", "main_process", 'discover'));
 
-    that.discoveryWin.webContents.on('did-finish-load', function() {
+    that.myWin.webContents.on('did-finish-load', function() {
       setTimeout(function() {
-        that.discoveryWin.show();
+        that.myWin.show();
       }, 40)
     })
 
@@ -85,69 +93,56 @@ var launchers = {
   },
   progress_connecting: function() {
     var that = launchers
+    //that.myWin.setSize(230, 160, true)
+    that.myWin.setContentSize(200, 150)
+    that.myWin.setResizable(false)
+    that.myWin.setMovable(false)
+    that.myWin.setMaximizable(false)
+    that.myWin.setMinimizable(false)
+    that.myWin.setFullScreenable(false)
+    that.myWin.setClosable(false)
+    that.myWin.setAlwaysOnTop(true)
+    that.myWin.center()
+    that.myWin.setProgressBar(2, 'indeterminate')
+    that.myWin.setMenuBarVisibility(false)
+    that.myWin.setTitle("Connecting")
 
-    that.progressWin = new BrowserWindow({
-      name: "Connecting",
-      title: "Connecting",
-      frame: false,
-      resizable: false,
-      width: 230,
-      height: 160,
-      transparent: true,
-      'node-integration': true,
-      show: true
-    })
 
-    that.progressWin.loadURL(url.format({
+
+
+    that.myWin.loadURL(url.format({
       pathname: path.join(__dirname, '..', 'renderer', 'progress_connecting.html'),
       protocol: 'file:',
       slashes: true
     }))
 
-    // Chrome developer tools
-    // that.progressWin.webContents.openDevTools({
-    //   detach: true
-    // });
-
-    that.progressWin.on('closed', () => {
-      that.progressWin = null
-    })
-    that.closed = false
-
-    that.progressWin.webContents.on('did-finish-load', function() {
-      if (that.discoveryWin) {
-        that.discoveryWin.close()
-        setTimeout(function() {
-          if (!that.closed) {
-            that.core_view()
-          }
-        }, 5000);
-      }
+    that.myWin.webContents.on('did-finish-load', function() {
+      setTimeout(function() {
+        //    that.core_view()
+      }, 5000)
     })
 
     ipcMain.on('cancel_loading_core', function(event, arg) {
-      if (that.progressWin.close()) {
-        that.closed = true
-        that.progressWin.close()
-      }
+      that.quit()
     })
   },
   core_view: function() {
     var that = launchers
+    that.myWin.setSize(500, 400, true)
+    that.myWin.setResizable(true)
+    that.myWin.setMovable(true)
+    that.myWin.setMaximizable(true)
+    that.myWin.setMinimizable(true)
+    that.myWin.setFullScreenable(true)
+    that.myWin.setClosable(true)
+    that.myWin.setAlwaysOnTop(false)
+    that.myWin.center()
+    that.myWin.maximize()
+    that.myWin.setProgressBar(-1)
+    that.myWin.setMenuBarVisibility(true)
+    that.myWin.setTitle("Snappy Robotics")
 
     debug("Building coreWin")
-
-    that.coreWin = new BrowserWindow({
-      name: "Snappy Robotics",
-      title: "Snappy Robotics",
-      frame: true,
-      resizable: true,
-      width: 500,
-      height: 400,
-      webPreferences: {
-        nodeIntegration: false
-      }
-    })
 
     var u = url.format({
       pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/red",
@@ -156,26 +151,13 @@ var launchers = {
     })
 
     debug(u)
-    that.coreWin.loadURL(u)
-
-    // Chrome developer tools
-    // that.progressWin.webContents.openDevTools({
-    //   detach: true
-    // });
-
-    that.coreWin.on('closed', () => {
-      that.coreWin = null
-    })
+    that.myWin.loadURL(u)
 
     debug('Loading')
 
-    that.coreWin.webContents.on('did-finish-load', function() {
+    that.myWin.webContents.on('did-finish-load', function() {
       debug('Loaded content')
-      if (that.progressWin) {
-        that.progressWin.close()
-        that.coreWin.maximize()
-        that.coreWin.show()
-      }
+      that.myWin.show()
     })
   }
 }
