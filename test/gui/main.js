@@ -50,8 +50,8 @@ describe('Snappy GUI', function() {
       .getMainProcessLogs().then(debug)
       .getRenderProcessLogs().then(debug)
       .click("#localBtn")
-      .pause(1000)
-      .windowByIndex(0)
+      .pause(100) // for next window to come up
+      .windowByIndex(1)
       .waitUntilTextExists('#status_txt', 'Connected', 60000)
   })
 
