@@ -112,16 +112,22 @@ var launchers = {
     that.progressWin.on('closed', () => {
       that.progressWin = null
     })
+    that.closed = false
 
     that.progressWin.webContents.on('did-finish-load', function() {
       if (that.discoveryWin) {
         that.discoveryWin.close()
-        that.core_view()
+        setTimeout(function() {
+          if (!that.closed) {
+            that.core_view()
+          }
+        }, 5000);
       }
     })
 
     ipcMain.on('cancel_loading_core', function(event, arg) {
       if (that.progressWin.close()) {
+        that.closed = true
         that.progressWin.close()
       }
     })
@@ -167,6 +173,7 @@ var launchers = {
       debug('Loaded content')
       if (that.progressWin) {
         that.progressWin.close()
+        that.coreWin.maximize()
         that.coreWin.show()
       }
     })

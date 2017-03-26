@@ -15,7 +15,7 @@ const core = require('snappy-core')
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
 
-  process.env.CI = true
+  //process.env.CI = true
 
   var app = null
 
@@ -49,12 +49,40 @@ describe('Snappy GUI', function() {
     return app.client.waitUntilWindowLoaded()
       .getMainProcessLogs().then(debug)
       .getRenderProcessLogs().then(debug)
+      .getWindowCount(debug)
       .click("#localBtn")
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .getWindowCount(function(count) {
+        debug(count)
+      })
       .pause(100) // for next window to come up
-      .windowByIndex(1)
-      .waitUntilTextExists('#status_txt', 'Connected', 60000)
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .windowByIndex(0)
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .getWindowCount(function(count) {
+        debug(count)
+      })
+      .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
   })
-
+  /*
   describe('connecting to existing local core', function() {
     before(function() {
       core.clean().then(function() { //Clean previous config
@@ -105,4 +133,5 @@ describe('Snappy GUI', function() {
         .waitUntilTextExists('#status_txt', 'Connected', 60000)
     })
   })
+  */
 })
