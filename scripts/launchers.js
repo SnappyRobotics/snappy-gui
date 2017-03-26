@@ -4,15 +4,15 @@ const url = require('url')
 const path = require('path')
 const debug = require('debug')("snappy:gui:launchers")
 
-const {
-  app,
-  ipcMain,
-  BrowserWindow
-} = require('electron')
+
+const app = global.snappy_gui.app;
+const ipcMain = global.snappy_gui.ipcMain;
+const BrowserWindow = global.snappy_gui.BrowserWindow;
 
 var launchers = {
   init: function() {
     var that = launchers
+    debug(require('electron').app)
 
     that.app = app
     that.app.on('window-all-closed', () => {
