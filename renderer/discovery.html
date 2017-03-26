@@ -3,12 +3,20 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title></title>
+		<title>Discovery Wizard</title>
 	</head>
 
 	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic'>
 	<link rel="stylesheet" type="text/css" href="../bower_components/angular-material/angular-material.css">
-
+	<style media="screen">
+		.hidden {
+			position: absolute;
+			/*top: -100px;*/
+			/*left: -100px;*/
+			/*opacity: 0;*/
+			z-index: -999999;
+		}
+	</style>
 	<script type="text/javascript" src="../bower_components/angular/angular.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-aria/angular-aria.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.js"></script>
@@ -16,11 +24,13 @@
 
 	<body ng-app="app">
 		<div ng-controller="discoveryController" style="padding:30px;" ng-cloak>
+			<span class="hidden" id="status_txt">{{status}}</span>
+
 			<h1> Device auto discovery wizard</h1>
 			<br>
 			<div ng-if="scanning">
 				<md-progress-linear md-mode="indeterminate"></md-progress-linear>
-				<b>{{status}}</b> : {{searching}}
+				<b id="status">{{status}}</b> :{{searching}}
 			</div>
 			<div ng-if="scanning === false">
 				<md-button id="rescanBtn" class="md-raised md-primary" ng-click="start_scanning()">
@@ -44,12 +54,13 @@
 				<md-list-item ng-repeat="ip in devices" layout="row">
 					<h3>{{ip}}</h3>
 					<span flex></span>
-					<md-button class="md-raised" ng-click="connect(ip)">
+					<md-button class="connectBtn md-raised" ng-click="connect(ip)">
 						Connect
 					</md-button>
 				</md-list-item>
 			</md-list>
 		</div>
+
 		<script type="text/javascript">
 			const ipc = require('electron').ipcRenderer
 

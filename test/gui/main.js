@@ -15,7 +15,7 @@ describe('Snappy GUI', function() {
 
   var app = null
 
-  before(function() {
+  beforeEach(function() {
     return helpers.startApplication({
       args: [path.join(__dirname, '..', '..', 'main.js')]
     }).then(function(startedApp) {
@@ -23,7 +23,7 @@ describe('Snappy GUI', function() {
     })
   })
 
-  after(function() {
+  afterEach(function() {
     return helpers.stopApplication(app)
   })
 
@@ -37,7 +37,7 @@ describe('Snappy GUI', function() {
       .browserWindow.isFocused().should.eventually.be.true
       .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
       .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
-      .browserWindow.getTitle().should.eventually.be.equal("Discovery")
+      .browserWindow.getTitle().should.eventually.be.equal("Discovery Wizard")
       .getText('#devices_count').should.eventually.equal('0')
   })
 
@@ -58,4 +58,30 @@ describe('Snappy GUI', function() {
     })
   })
 
+  describe('separate local core', function() {
+    const core = require('snappy-core')
+
+    it('check the devices to be 0 without any server', function() {
+      return app.client.waitUntilWindowLoaded()
+        .waitUntilTextExists('#status_txt', 'Scan complete')
+        .getText('#devices_count').should.eventually.equal('0')
+    })
+
+    describe('local running core', function() {
+      before(function() {
+        return core.start() //start the core
+      })
+
+      it('check the devices to be 1 with a on running server', function() {
+        return app.client.waitUntilWindowLoaded()
+          .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
+          .getText('#devices_count').should.eventually.equal('1')
+      })
+
+      it('press connect as soon as device detected', function() {
+        return app.client.waitUntilWindowLoaded()
+          .getText('#devices_count').should.eventually.equal('1')
+      })
+    })
+  })
 })
