@@ -13,17 +13,38 @@
 	<script type="text/javascript" src="../bower_components/angular-aria/angular-aria.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-material/angular-material.js"></script>
+	<style media="screen">
+		html,
+		body {
+			margin: 0px!important;
+			padding: 0px!important;
+			background: none!important;
+		}
 
-	<body ng-app="app">
-		<div ng-controller="progressController" layout="column" layout-align="center center" style="padding:10px" ng-cloak>
+		#body {
+			width: 200px!important;
+			height: 150px!important;
+			background: rgba(255, 255, 255, 1)!important;
+			border: 2px black;
+			box-shadow: 5px 5px 10px 1px rgba(0, 0, 0, 0.7);
+			border-radius: 4px;
+			margin: 0px!important;
+		}
+	</style>
+
+	<body ng-app="app" ng-controller="progressController" ng-cloak>
+		<div id="body" layout="column" layout-align="center center">
+			<br>
 			<md-progress-circular md-mode="indeterminate"></md-progress-circular>
-			Connecting ....
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connecting ....
+			<br>
+			<md-button ng-click="cancelLoading()">Cancel connecting</md-button>
 		</div>
 		<script type="text/javascript">
 			const ipc = require('electron').ipcRenderer
 
-			function debug(s) {
-				console.log(s);
+			function debug(s, s1, s2) {
+				console.log(s, s1, s2);
 			}
 
 			angular
@@ -37,6 +58,9 @@
 				}])
 				.controller('progressController', ['$scope', function($scope) {
 					debug("Controller started");
+					$scope.cancelLoading = function() {
+						ipc.send('cancel_loading_core');
+					}
 				}]);
 		</script>
 	</body>

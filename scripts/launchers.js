@@ -4,8 +4,6 @@ const url = require('url')
 const path = require('path')
 const debug = require('debug')("snappy:gui:launchers")
 
-//const discovery = require(path.join(__dirname, 'scripts', 'discovery'))
-
 const {
   app,
   ipcMain,
@@ -62,30 +60,21 @@ var launchers = {
     that.discoveryWin.webContents.on('did-finish-load', function() {
       setTimeout(function() {
         that.discoveryWin.show();
-        // console.error(Date.now());
       }, 40)
     })
 
     ipcMain.on('start_core', function(event, arg) {
       global.snappy_gui.core = require('snappy-core')
-      //global.snappy_gui.core.then(function () {
 
       setTimeout(function() {
         debug("Calling connect core to local core")
         ipcMain.emit("connect_core", "127.0.0.1")
       }, 100)
-      //})
     })
 
     ipcMain.on('connect_core', function(event, arg) {
       global.snappy_gui.client_IP = arg
       that.progress_connecting()
-      /*progress = createWindow("Loading", "progress.html", 150, 100)
-      setTimeout(function() {
-        progress.show();
-        launchWin.close()
-      }, 50)
-      */
     })
   },
   progress_connecting: function() {
@@ -96,8 +85,10 @@ var launchers = {
       title: "Connecting",
       frame: false,
       resizable: false,
-      width: 200,
-      height: 100,
+      width: 230,
+      height: 160,
+      transparent: true,
+      'node-integration': true,
       show: true
     })
 
@@ -108,15 +99,20 @@ var launchers = {
     }))
 
     // Chrome developer tools
-    // win.webContents.openDevTools({
-    //   // detach: true
+    // that.progressWin.webContents.openDevTools({
+    //   detach: true
     // });
+
     that.progressWin.on('closed', () => {
       that.progressWin = null
     })
 
     that.progressWin.webContents.on('did-finish-load', function() {
-      that.discoveryWin.close();
+      that.discoveryWin.close()
+    })
+
+    ipcMain.on('cancel_loading_core', function(event, arg) {
+      that.progressWin.close()
     })
   }
 }
