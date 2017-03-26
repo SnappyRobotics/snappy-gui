@@ -85,6 +85,19 @@ var discovery = {
   ping: function(ip, callback) {
     return bindCallback(when.promise(function(resolve, reject) {
       req({
+        uri: "http://127.0.0.1/info"
+      }, function(err, resp) {
+        debug("1:", err)
+        debug("2:", resp)
+      })
+      req({
+        uri: "http://127.0.0.1"
+      }, function(err, resp) {
+        debug("3:", err)
+        debug("4:", resp)
+      })
+
+      req({
         uri: "http://" + ip + ":" + global.snappy_gui.client_PORT + "/info",
         agent: "",
         headers: {
@@ -94,7 +107,7 @@ var discovery = {
         }
       }, function(err, resp) {
         if (err) {
-          //  throw err
+          throw err
           resolve({
             ip: ip,
             found: false
