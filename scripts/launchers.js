@@ -110,11 +110,15 @@ var launchers = {
     })
 
     that.progressWin.webContents.on('did-finish-load', function() {
-      that.discoveryWin.close()
+      if (that.discoveryWin) {
+        that.discoveryWin.close()
+      }
     })
 
     ipcMain.on('cancel_loading_core', function(event, arg) {
-      that.progressWin.close()
+      if (that.progressWin.close()) {
+        that.progressWin.close()
+      }
     })
   }
 }

@@ -30,15 +30,21 @@
 			border-radius: 4px;
 			margin: 0px!important;
 		}
+
+		.hidden {
+			position: absolute;
+			z-index: -999999;
+		}
 	</style>
 
 	<body ng-app="app" ng-controller="progressController" ng-cloak>
 		<div id="body" layout="column" layout-align="center center">
+			<span class="hidden" id="status_txt">{{status}}</span>
 			<br>
 			<md-progress-circular md-mode="indeterminate"></md-progress-circular>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connecting ....
 			<br>
-			<md-button ng-click="cancelLoading()">Cancel connecting</md-button>
+			<md-button id="cancelConnectingBtn" ng-click="cancelLoading()">Cancel connecting</md-button>
 		</div>
 		<script type="text/javascript">
 			const ipc = require('electron').ipcRenderer
@@ -58,9 +64,16 @@
 				}])
 				.controller('progressController', ['$scope', function($scope) {
 					debug("Controller started");
+					$scope.status = "Connecting"
 					$scope.cancelLoading = function() {
 						ipc.send('cancel_loading_core');
 					}
+
+					setTimeout(function() {
+						$scope.$apply(function() {
+							$scope.status = "Connected";
+						})
+					}, 2000);
 				}]);
 		</script>
 	</body>

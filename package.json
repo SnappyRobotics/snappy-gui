@@ -4,7 +4,7 @@
   "description": "Snappy Robotics GUI",
   "main": "main.js",
   "scripts": {
-    "test": "DEBUG=snappy:*,-snappy:gui:test:global-setup grunt test",
+    "test": "DEBUG=snappy:* grunt test",
     "serve": "DEBUG=-reqfast.*,snappy:* nodemon .",
     "start": "DEBUG=snappy:* electron main.js"
   },

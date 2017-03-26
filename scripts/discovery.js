@@ -30,6 +30,7 @@ var discovery = {
           }
         }
       }
+      debug("Network Interfaces :", addresses)
       resolve(addresses)
     }), callback)
   },
