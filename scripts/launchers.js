@@ -66,13 +66,19 @@ var launchers = {
     ipcMain.on('start_core', function(event, arg) {
       global.snappy_gui.core = require('snappy-core')
 
-      global.snappy_gui.core.start()
-
-      debug("Calling connect core to local core")
-      ipcMain.emit("connect_core", "127.0.0.1")
+      global.snappy_gui.core.start().then(function() {
+        debug("Calling connect core to local core")
+        ipcMain.emit("connect_core", "127.0.0.1")
+      })
     })
 
     ipcMain.on('connect_core', function(event, arg) {
+      if (!arg) {
+        arg = '127.0.0.1'
+      }
+
+      debug("Connecting to IP:", arg)
+
       global.snappy_gui.client_IP = arg
       that.progress_connecting()
     })
@@ -110,12 +116,58 @@ var launchers = {
     that.progressWin.webContents.on('did-finish-load', function() {
       if (that.discoveryWin) {
         that.discoveryWin.close()
+        that.core_view()
       }
     })
 
     ipcMain.on('cancel_loading_core', function(event, arg) {
       if (that.progressWin.close()) {
         that.progressWin.close()
+      }
+    })
+  },
+  core_view: function() {
+    var that = launchers
+
+    debug("Building coreWin")
+
+    that.coreWin = new BrowserWindow({
+      name: "Snappy Robotics",
+      title: "Snappy Robotics",
+      frame: true,
+      resizable: true,
+      width: 500,
+      height: 400,
+      webPreferences: {
+        nodeIntegration: false
+      }
+    })
+
+    var u = url.format({
+      pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/red",
+      protocol: 'http:',
+      slashes: true
+    })
+
+    debug(u)
+    that.coreWin.loadURL(u)
+
+    // Chrome developer tools
+    // that.progressWin.webContents.openDevTools({
+    //   detach: true
+    // });
+
+    that.coreWin.on('closed', () => {
+      that.coreWin = null
+    })
+
+    debug('Loading')
+
+    that.coreWin.webContents.on('did-finish-load', function() {
+      debug('Loaded content')
+      if (that.progressWin) {
+        that.progressWin.close()
+        that.coreWin.show()
       }
     })
   }
