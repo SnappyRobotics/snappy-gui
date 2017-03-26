@@ -5,6 +5,8 @@ before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
+  - npm install -g bower
+  - bower install
 notifications:
   email: false
   slack: snappyrobotics:hnC94BBFxWP0egOTG39EX3Jc
