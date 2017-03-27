@@ -82,7 +82,9 @@ var launchers = {
 
       global.snappy_gui.core.start().then(function() {
         debug("local core started")
-        event.sender.send("connect_core", '127.0.0.1')
+
+        global.snappy_gui.client_IP = '127.0.0.1'
+        that.progress_connecting()
       })
     })
     ipcMain.on('connect_core', function(event, arg) {

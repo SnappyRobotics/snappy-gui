@@ -80,13 +80,13 @@
 					debug("Controller started");
 
 					$scope.start_core = function() {
-						ipc.send('start_core');
 						$scope.connecting = true
+						ipc.send('start_core');
 					}
 
 					$scope.connect = function(ip) {
-						ipc.send('connect_core', ip);
 						$scope.connecting = true
+						ipc.send('connect_core', ip);
 					}
 
 					$scope.cancelLoading = function() {
