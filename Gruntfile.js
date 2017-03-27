@@ -22,7 +22,10 @@ module.exports = function(grunt) {
         'freeze': true,
         'latedef': true,
         'maxerr': 2,
-        'bitwise': true
+        'bitwise': true,
+        "globals": {
+          "Promise": true
+        }
       },
       main_process: {
         files: {

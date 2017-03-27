@@ -9,11 +9,9 @@ const {
 
 const req = require('req-fast')
 const path = require('path')
-const when = require('when')
+const Promise = require('bluebird')
 const fs = require('fs')
 const os = require('os')
-const bindCallback = require('when/node').bindCallback;
-
 
 const debug = require('debug')("snappy:gui:discovery")
 
@@ -53,7 +51,7 @@ var discovery = {
         ar.push(promise)
       }
 
-      var p = when.all(ar)
+      var p = Promise.all(ar)
       p.done(function(ot) {
         debug("Scanning complete")
         if (that.sending) {
@@ -68,7 +66,7 @@ var discovery = {
     })
   },
   ips: function(callback) {
-    return bindCallback(when.promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       var interfaces = os.networkInterfaces()
       var addresses = []
       for (var k in interfaces) {
@@ -94,10 +92,10 @@ var discovery = {
       }
       debug("Network Interfaces :", addresses)
       resolve(addresses)
-    }), callback)
+    })
   },
   getRange: function(callback) {
-    return bindCallback(when.promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       discovery.ips().then(function(addresses) {
         var ar = []
         for (var i = 0; i < addresses.length; i++) {
@@ -111,11 +109,11 @@ var discovery = {
         }
         resolve(ar)
       })
-    }), callback)
+    })
   },
   autoScan: function(callback) {
     var retAr = []
-    return bindCallback(when.promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       discovery.getRange().then(function(range) {
         var ar = []
         for (var i = 0; i < range.length; i++) {
@@ -123,7 +121,7 @@ var discovery = {
         }
         ar.push(discovery.ping("127.0.0.1")) //------------ adding localhost
 
-        var p = when.all(ar)
+        var p = Promise.all(ar)
         p.done(function(ot) {
           for (var i = 0; i < ot.length; i++) {
             if (ot[i].found) {
@@ -137,10 +135,10 @@ var discovery = {
           resolve(er)
         })
       })
-    }), callback)
+    })
   },
   ping: function(ip, callback) {
-    return bindCallback(when.promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       req({
         uri: "http://" + ip + ":" + global.snappy_gui.client_PORT + "/info",
         agent: "",
@@ -173,7 +171,7 @@ var discovery = {
         }
         //debug(resp)
       })
-    }), callback)
+    })
   }
 }
 
