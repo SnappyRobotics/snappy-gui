@@ -66,9 +66,27 @@ var launchers = {
     // });
     that.myWin.on('closed', function() {
       debug("Closed window")
-      that.quit()
+      //  that.quit()
     })
 
+    that.myWin.on('close', function() {
+      debug("Closing... window")
+    })
+
+    that.myWin.on('unresponsive', function() {
+      debug("unresponsive... window")
+    })
+
+
+    that.myWin.onbeforeunload = (e) => {
+      debug('I do not want to be closed')
+
+      // Unlike usual browsers that a message box will be prompted to users, returning
+      // a non-void value will silently cancel the close.
+      // It is recommended to use the dialog API to let the user confirm closing the
+      // application.
+      e.returnValue = false
+    }
     const discover = require(path.join(__dirname, "..", "main_process", 'discover'));
 
     that.myWin.webContents.on('did-finish-load', function() {
