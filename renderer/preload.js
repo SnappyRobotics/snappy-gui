@@ -1,5 +1,5 @@
 'use strict';
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'dev') {
   window.electronRequire = require
 }
 window.ipc = window.electronRequire('electron').ipcRenderer
