@@ -11,9 +11,6 @@
 	<style media="screen">
 		.hidden {
 			position: absolute;
-			/*top: -100px;*/
-			/*left: -100px;*/
-			/*opacity: 0;*/
 			z-index: -999999;
 		}
 	</style>
@@ -22,8 +19,16 @@
 	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-material/angular-material.js"></script>
 
-	<body ng-app="app">
-		<div ng-controller="discoveryController" style="padding:30px;" ng-cloak>
+	<body ng-app="app" ng-controller="discoveryController" ng-cloak>
+		<div ng-show="connecting" layout="column" layout-align="center center">
+			<br>
+			<md-progress-circular md-mode="indeterminate"></md-progress-circular>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connecting ....
+			<br>
+			<md-button id="cancelConnectingBtn" ng-click="cancelLoading()">Cancel connecting</md-button>
+		</div>
+
+		<div ng-hide="connecting" style="padding:30px;">
 			<span class="hidden" id="status_txt">{{status}}</span>
 
 			<h1> Device auto discovery wizard</h1>
@@ -62,12 +67,6 @@
 		</div>
 
 		<script type="text/javascript">
-			const ipc = require('electron').ipcRenderer
-
-			function debug(s) {
-				console.log(s);
-			}
-
 			angular
 				.module('app', ['ngMaterial', 'ngAnimate'])
 				.config(['$mdThemingProvider', function($mdThemingProvider) {
@@ -81,11 +80,17 @@
 					debug("Controller started");
 
 					$scope.start_core = function() {
+						$scope.connecting = true
 						ipc.send('start_core');
 					}
 
 					$scope.connect = function(ip) {
+						$scope.connecting = true
 						ipc.send('connect_core', ip);
+					}
+
+					$scope.cancelLoading = function() {
+						ipc.send('cancel_loading_core');
 					}
 
 					$scope.start_scanning = function() {
@@ -95,17 +100,15 @@
 						$scope.devices = [];
 
 						ipc.on("discovery:devices", function(em, devices) {
-							if (debug) {
-								debug("Got :" + devices);
-							}
+							debug("Got :" + devices);
+
 							$scope.$apply(function() {
 								$scope.devices = devices;
 							})
 						})
 						ipc.on("discovery:searching", function(em, ip) {
-							if (debug) {
-								debug("Searching for :" + ip);
-							}
+							debug("Searching for :" + ip);
+
 							$scope.$apply(function() {
 								$scope.searching = ip;
 							})

@@ -4,9 +4,9 @@
   "description": "Snappy Robotics GUI",
   "main": "main.js",
   "scripts": {
-    "test": "DEBUG=snappy:* grunt test",
+    "test": "NODE_ENV=test DEBUG=snappy:* grunt test",
     "serve": "DEBUG=-reqfast.*,snappy:* nodemon .",
-    "start": "DEBUG=snappy:* electron main.js"
+    "start": "DEBUG=snappy:* electron main.js  --debug"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/SnappyRobotics/snappy-gui#readme",
   "dependencies": {
+    "electron-debug": "^1.1.0",
     "ip": "^1.1.5",
     "netmask": "^1.0.6",
     "nodemon": "^1.11.0",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
+    "devtron": "^1.4.0",
     "electron": "^1.6.2",
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",

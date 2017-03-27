@@ -39,6 +39,9 @@ module.exports = function(grunt) {
           src: [
             'renderer/**/*.js'
           ]
+        },
+        options: {
+          'browser': true
         }
       },
       tests: {

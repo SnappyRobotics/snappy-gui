@@ -10,38 +10,51 @@ const {
   BrowserWindow
 } = require('electron')
 
+// adds debug features like hotkeys for triggering dev tools and reload
+require('electron-debug')();
+
 var launchers = {
-  init: function() {
+  quit: function() {
     var that = launchers
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  },
+  init: function() {
+    var that = this
 
-    that.app = app
-    that.app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
-        that.app.quit()
-      }
-    })
+    app.on('window-all-closed', () => {
+      that.quit()
+    });
 
-    that.app.on('ready', that.discovery)
-    that.app.on('activate', () => {
-      if (that.discoveryWin === null) {
+    app.on('activate', () => {
+      if (!that.myWin) {
         that.discovery()
       }
-    })
+    });
+
+    app.on('ready', () => {
+      that.discovery()
+    });
   },
   discovery: function() {
-    var that = launchers
+    var that = this
 
-    that.discoveryWin = new BrowserWindow({
+    that.myWin = new BrowserWindow({
       name: "Discovery",
       title: "Discovery",
       frame: true,
       resizable: true,
       width: 600,
       height: 400,
+      webPreferences: {
+        nodeIntegration: false,
+        preload: path.join(__dirname, '..', 'renderer', "preload.js")
+      },
       show: false
     })
 
-    that.discoveryWin.loadURL(url.format({
+    that.myWin.loadURL(url.format({
       pathname: path.join(__dirname, '..', 'renderer', 'discovery.html'),
       protocol: 'file:',
       slashes: true
@@ -51,32 +64,30 @@ var launchers = {
     // win.webContents.openDevTools({
     //   // detach: true
     // });
-    that.discoveryWin.on('closed', () => {
-      that.discoveryWin = null
+    that.myWin.on('closed', function() {
+      debug("Closed window")
+      that.quit()
     })
 
     const discover = require(path.join(__dirname, "..", "main_process", 'discover'));
 
-    that.discoveryWin.webContents.on('did-finish-load', function() {
-      setTimeout(function() {
-        that.discoveryWin.show();
-      }, 40)
+    that.myWin.webContents.on('did-finish-load', function() {
+      debug("loaded mainWin with discovery")
+      that.myWin.show()
     })
+
 
     ipcMain.on('start_core', function(event, arg) {
       global.snappy_gui.core = require('snappy-core')
 
       global.snappy_gui.core.start().then(function() {
-        debug("Calling connect core to local core")
-        ipcMain.emit("connect_core", "127.0.0.1")
+        debug("local core started")
+
+        global.snappy_gui.client_IP = '127.0.0.1'
+        that.progress_connecting()
       })
     })
-
     ipcMain.on('connect_core', function(event, arg) {
-      if (!arg) {
-        arg = '127.0.0.1'
-      }
-
       debug("Connecting to IP:", arg)
 
       global.snappy_gui.client_IP = arg
@@ -85,69 +96,46 @@ var launchers = {
   },
   progress_connecting: function() {
     var that = launchers
-
-    that.progressWin = new BrowserWindow({
-      name: "Connecting",
-      title: "Connecting",
-      frame: false,
-      resizable: false,
-      width: 230,
-      height: 160,
-      transparent: true,
-      'node-integration': true,
-      show: true
-    })
-
-    that.progressWin.loadURL(url.format({
-      pathname: path.join(__dirname, '..', 'renderer', 'progress_connecting.html'),
-      protocol: 'file:',
-      slashes: true
-    }))
-
-    // Chrome developer tools
-    // that.progressWin.webContents.openDevTools({
-    //   detach: true
-    // });
-
-    that.progressWin.on('closed', () => {
-      that.progressWin = null
-    })
-    that.closed = false
-
-    that.progressWin.webContents.on('did-finish-load', function() {
-      if (that.discoveryWin) {
-        that.discoveryWin.close()
-        setTimeout(function() {
-          if (!that.closed) {
-            that.core_view()
-          }
-        }, 5000);
-      }
-    })
+    //that.myWin.setSize(230, 160, true)
+    that.myWin.setContentSize(200, 150)
+    that.myWin.setResizable(false)
+    that.myWin.setMovable(false)
+    that.myWin.setMaximizable(false)
+    that.myWin.setMinimizable(false)
+    that.myWin.setFullScreenable(false)
+    that.myWin.setClosable(false)
+    that.myWin.setAlwaysOnTop(true)
+    that.myWin.center()
+    that.myWin.setProgressBar(2, 'indeterminate')
+    that.myWin.setMenuBarVisibility(false)
+    that.myWin.setTitle("Connecting")
 
     ipcMain.on('cancel_loading_core', function(event, arg) {
-      if (that.progressWin.close()) {
-        that.closed = true
-        that.progressWin.close()
-      }
+      that.quit()
     })
+
+    setTimeout(function() {
+      that.core_view()
+    }, 2000);
   },
   core_view: function() {
-    var that = launchers
+    var that = this
+
+    that.myWin.setSize(500, 400, true)
+    that.myWin.setResizable(true)
+    that.myWin.setMovable(true)
+    that.myWin.setMaximizable(true)
+    that.myWin.setMinimizable(true)
+    that.myWin.setFullScreenable(true)
+    that.myWin.setClosable(true)
+    that.myWin.setAlwaysOnTop(false)
+    that.myWin.center()
+    that.myWin.maximize()
+    that.myWin.setProgressBar(-1)
+    that.myWin.setMenuBarVisibility(true)
+    that.myWin.setTitle("Snappy Robotics")
 
     debug("Building coreWin")
-
-    that.coreWin = new BrowserWindow({
-      name: "Snappy Robotics",
-      title: "Snappy Robotics",
-      frame: true,
-      resizable: true,
-      width: 500,
-      height: 400,
-      webPreferences: {
-        nodeIntegration: false
-      }
-    })
 
     var u = url.format({
       pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/red",
@@ -156,27 +144,13 @@ var launchers = {
     })
 
     debug(u)
-    that.coreWin.loadURL(u)
+    that.myWin.loadURL(u)
 
-    // Chrome developer tools
-    // that.progressWin.webContents.openDevTools({
-    //   detach: true
-    // });
-
-    that.coreWin.on('closed', () => {
-      that.coreWin = null
+    that.myWin.webContents.on('did-finish-load', function() {
+      debug('Loaded content')
     })
 
     debug('Loading')
-
-    that.coreWin.webContents.on('did-finish-load', function() {
-      debug('Loaded content')
-      if (that.progressWin) {
-        that.progressWin.close()
-        that.coreWin.maximize()
-        that.coreWin.show()
-      }
-    })
   }
 }
 

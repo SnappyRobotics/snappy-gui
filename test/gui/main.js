@@ -15,7 +15,7 @@ const core = require('snappy-core')
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
 
-  //process.env.CI = true
+  process.env.CI = true
 
   var app = null
 
@@ -32,16 +32,19 @@ describe('Snappy GUI', function() {
   })
 
   it('opens discovery window with no clients', function() {
-    return app.client.waitUntilWindowLoaded()
-      .browserWindow.focus()
+    return app.client
+      .getMainProcessLogs().then(debug)
+      .getRenderProcessLogs().then(debug)
+      .waitUntilWindowLoaded()
       .getWindowCount().should.eventually.equal(1)
+      .browserWindow.focus()
       .browserWindow.isMinimized().should.eventually.be.false
       .browserWindow.isDevToolsOpened().should.eventually.be.false
       .browserWindow.isVisible().should.eventually.be.true
       .browserWindow.isFocused().should.eventually.be.true
       .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
       .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
-      .browserWindow.getTitle().should.eventually.be.equal("Discovery Wizard")
+      .getTitle().should.eventually.be.equal("Discovery Wizard")
       .getText('#devices_count').should.eventually.equal('0')
   })
 
@@ -51,38 +54,12 @@ describe('Snappy GUI', function() {
       .getRenderProcessLogs().then(debug)
       .getWindowCount(debug)
       .click("#localBtn")
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
       .pause(100) // for next window to come up
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
       .windowByIndex(0)
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
       .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
   })
-  /*
+
+
   describe('connecting to existing local core', function() {
     before(function() {
       core.clean().then(function() { //Clean previous config
@@ -92,7 +69,6 @@ describe('Snappy GUI', function() {
     after(function() {
       return core.stop()
     })
-
     it('waiting for scanning to complete', function() {
       return app.client.waitUntilWindowLoaded()
         .getMainProcessLogs().then(function(logs) {
@@ -108,9 +84,7 @@ describe('Snappy GUI', function() {
         .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
         .getText('#devices_count').should.eventually.equal('1')
         .click(".connectBtn")
-        .pause(100) // for next window to come up
-        .windowByIndex(1)
-        .waitUntilTextExists('#status_txt', 'Connected', 60000)
+        .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
     })
 
     it('click without waiting for scanning to complete', function() {
@@ -125,13 +99,10 @@ describe('Snappy GUI', function() {
             debug("Renderer Process :", log.message)
           })
         })
+        .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
         .getText('#devices_count').should.eventually.equal('1')
-        .pause(100) // for next window to come up
         .click(".connectBtn")
-        .pause(100) // for next window to come up
-        .windowByIndex(1)
-        .waitUntilTextExists('#status_txt', 'Connected', 60000)
+        .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
     })
   })
-  */
 })
