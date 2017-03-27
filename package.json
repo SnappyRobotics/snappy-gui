@@ -6,7 +6,7 @@
   "scripts": {
     "test": "NODE_ENV=test DEBUG=snappy:* grunt test",
     "start": "NODE_ENV=dev DEBUG=snappy:* electron main.js  --debug",
-    "postinstall": "./node_modules/.bin/bower install",
+    "postinstall": "./node_modules/.bin/bower install && npm run rebuild",
     "rebuild": "electron-rebuild -f -w serialport"
   },
   "repository": {
