@@ -15,16 +15,39 @@ const os = require('os')
 
 const debug = require('debug')("snappy:gui:discovery")
 
+Promise.config({
+  // Enable warnings
+  warnings: true,
+  // Enable long stack traces
+  longStackTraces: true,
+  // Enable cancellation
+  cancellation: true,
+  // Enable monitoring
+  monitoring: true
+});
+
 var discovery = {
   init: function() {
     var that = discovery
     debug("discovery init")
     ipcMain.on('discovery:start_scanning', that.start_scanning)
+    setTimeout(function() {
+      if (that.allPromises) {
+        that.allPromises.cancel()
+      } else {
+        debug("No Promise found")
+      }
+    }, 4000);
 
     ipcMain.on('connect_core', function(event, arg) {
-      that.sending = false;
+      debug("received connect_core ipc event")
+      // that.sending = false;
+      if (that.allPromises) {
+        that.allPromises.cancel()
+      }
     })
   },
+  allPromises: null,
   sending: true,
   start_scanning: function(event, arg) {
     var that = discovery
@@ -36,37 +59,34 @@ var discovery = {
       range.unshift("127.0.0.1") //------------ adding localhost to first
       for (var i = 0; i < range.length; i++) {
         var promise = discovery.ping(range[i]);
-        promise.done(function(ip) {
-          if (that.sending) {
-            event.sender.send("discovery:searching", ip.ip)
-          }
+        promise.then(function(ip) {
+          event.sender.send("discovery:searching", ip.ip)
           if (ip.found) {
             debug("Found Device at :", ip.ip)
             retAr.push(ip.ip)
-            if (that.sending) {
-              event.sender.send("discovery:devices", retAr)
-            }
+            event.sender.send("discovery:devices", retAr)
           }
         })
         ar.push(promise)
       }
 
-      var p = Promise.all(ar)
-      p.done(function(ot) {
-        debug("Scanning complete")
-        if (that.sending) {
+      that.allPromises = Promise.all(ar)
+      that.allPromises
+        .then(function(ot) {
+          debug("Scanning complete")
           event.sender.send("discovery:scan_done", retAr)
-        }
-      }, function(er) {
-        debug(er)
-        if (that.sending) {
-          event.sender.send("discovery:scan_done", er)
-        }
-      })
+        })
+        .finally(function() {
+          debug("Scanning completed finally")
+          event.sender.send("discovery:scan_done", [])
+        })
     })
   },
   ips: function(callback) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject, onCancel) {
+      onCancel(function() {
+        resolve([])
+      })
       var interfaces = os.networkInterfaces()
       var addresses = []
       for (var k in interfaces) {
@@ -95,7 +115,10 @@ var discovery = {
     })
   },
   getRange: function(callback) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject, onCancel) {
+      onCancel(function() {
+        resolve([])
+      })
       discovery.ips().then(function(addresses) {
         var ar = []
         for (var i = 0; i < addresses.length; i++) {
@@ -113,7 +136,7 @@ var discovery = {
   },
   autoScan: function(callback) {
     var retAr = []
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject, onCancel) {
       discovery.getRange().then(function(range) {
         var ar = []
         for (var i = 0; i < range.length; i++) {
@@ -122,24 +145,29 @@ var discovery = {
         ar.push(discovery.ping("127.0.0.1")) //------------ adding localhost
 
         var p = Promise.all(ar)
-        p.done(function(ot) {
-          for (var i = 0; i < ot.length; i++) {
-            if (ot[i].found) {
-              retAr.push(ot[i].ip)
-            }
-          }
-          debug("Scanning complete")
-          resolve(retAr)
-        }, function(er) {
-          debug(er)
-          resolve(er)
+
+        onCancel(function() {
+          p.cancel()
         })
+        p
+          .then(function(ot) {
+            for (var i = 0; i < ot.length; i++) {
+              if (ot[i].found) {
+                retAr.push(ot[i].ip)
+              }
+            }
+            debug("Scanning complete")
+            resolve(retAr)
+          })
+          .finally(function() {
+            resolve([])
+          })
       })
     })
   },
   ping: function(ip, callback) {
-    return new Promise(function(resolve, reject) {
-      req({
+    return new Promise(function(resolve, reject, onCancel) {
+      var rs = req({
         uri: "http://" + ip + ":" + global.snappy_gui.client_PORT + "/info",
         agent: "",
         headers: {
@@ -170,6 +198,9 @@ var discovery = {
           })
         }
         //debug(resp)
+      })
+      onCancel(function() {
+        rs.abort()
       })
     })
   }
