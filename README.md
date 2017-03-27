@@ -6,8 +6,7 @@ Test Status : [![Build Status](https://travis-ci.org/SnappyRobotics/snappy-gui.s
 Dependency check : [![Dependency Status](https://david-dm.org/SnappyRobotics/snappy-gui.svg)](https://david-dm.org/SnappyRobotics/snappy-gui)
 
 Development dependency check :
-[![DevDependencies Status](https://david-dm.org/dev/SnappyRobotics/snappy-gui.svg)](https://david-dm.org/SnappyRobotics/snappy-gui#info=devDependencies)
-
+[![devDependencies Status](https://david-dm.org/SnappyRobotics/snappy-gui/dev-status.svg)](https://david-dm.org/SnappyRobotics/snappy-gui?type=dev)
 
 [![npm](https://img.shields.io/npm/dt/snappy-gui.svg)](https://snappyrobotics.github.io/)
 
