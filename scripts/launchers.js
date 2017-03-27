@@ -77,15 +77,15 @@ var launchers = {
     })
 
 
+    ipcMain.on('start_core', function(event, arg) {
+      global.snappy_gui.core = require('snappy-core')
+
+      global.snappy_gui.core.start().then(function() {
+        debug("local core started")
+        event.sender.send("connect_core", '127.0.0.1')
+      })
+    })
     ipcMain.on('connect_core', function(event, arg) {
-      if (arg == '127.0.0.1') {
-        global.snappy_gui.core = require('snappy-core')
-
-        global.snappy_gui.core.start().then(function() {
-          debug("Calling connect core to local core")
-        })
-      }
-
       debug("Connecting to IP:", arg)
 
       global.snappy_gui.client_IP = arg

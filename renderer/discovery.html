@@ -80,7 +80,8 @@
 					debug("Controller started");
 
 					$scope.start_core = function() {
-						$scope.connect("127.0.0.1");
+						ipc.send('start_core');
+						$scope.connecting = true
 					}
 
 					$scope.connect = function(ip) {

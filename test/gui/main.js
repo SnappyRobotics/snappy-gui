@@ -15,7 +15,7 @@ const core = require('snappy-core')
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
 
-  //process.env.CI = true
+  process.env.CI = true
 
   var app = null
 
@@ -58,7 +58,8 @@ describe('Snappy GUI', function() {
       .windowByIndex(0)
       .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
   })
-  /*
+
+
   describe('connecting to existing local core', function() {
     before(function() {
       core.clean().then(function() { //Clean previous config
@@ -68,7 +69,6 @@ describe('Snappy GUI', function() {
     after(function() {
       return core.stop()
     })
-
     it('waiting for scanning to complete', function() {
       return app.client.waitUntilWindowLoaded()
         .getMainProcessLogs().then(function(logs) {
@@ -84,9 +84,7 @@ describe('Snappy GUI', function() {
         .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
         .getText('#devices_count').should.eventually.equal('1')
         .click(".connectBtn")
-        .pause(100) // for next window to come up
-        .windowByIndex(1)
-        .waitUntilTextExists('#status_txt', 'Connected', 60000)
+        .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
     })
 
     it('click without waiting for scanning to complete', function() {
@@ -101,13 +99,10 @@ describe('Snappy GUI', function() {
             debug("Renderer Process :", log.message)
           })
         })
+        .waitUntilTextExists('#status_txt', 'Scan complete', 60000)
         .getText('#devices_count').should.eventually.equal('1')
-        .pause(100) // for next window to come up
         .click(".connectBtn")
-        .pause(100) // for next window to come up
-        .windowByIndex(1)
-        .waitUntilTextExists('#status_txt', 'Connected', 60000)
+        .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
     })
   })
-  */
 })
