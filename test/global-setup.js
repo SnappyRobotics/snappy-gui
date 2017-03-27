@@ -34,7 +34,8 @@ exports.startApplication = function(options) {
   if (process.env.CI) {
     options.startTimeout = 30000
   }
-
+  options.quitTimeout = 1000
+  options.requireName = 'electronRequire'
   //debug("Options:", options)
 
   var app = new Application(options)

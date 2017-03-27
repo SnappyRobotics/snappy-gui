@@ -32,16 +32,19 @@ describe('Snappy GUI', function() {
   })
 
   it('opens discovery window with no clients', function() {
-    return app.client.waitUntilWindowLoaded()
-      .browserWindow.focus()
+    return app.client
+      .getMainProcessLogs().then(debug)
+      .getRenderProcessLogs().then(debug)
+      .waitUntilWindowLoaded()
       .getWindowCount().should.eventually.equal(1)
+      .browserWindow.focus()
       .browserWindow.isMinimized().should.eventually.be.false
       .browserWindow.isDevToolsOpened().should.eventually.be.false
       .browserWindow.isVisible().should.eventually.be.true
       .browserWindow.isFocused().should.eventually.be.true
       .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
       .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
-      .browserWindow.getTitle().should.eventually.be.equal("Discovery Wizard")
+      .getTitle().should.eventually.be.equal("Discovery Wizard")
       .getText('#devices_count').should.eventually.equal('0')
   })
 
@@ -51,35 +54,8 @@ describe('Snappy GUI', function() {
       .getRenderProcessLogs().then(debug)
       .getWindowCount(debug)
       .click("#localBtn")
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
       .pause(100) // for next window to come up
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
       .windowByIndex(0)
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
-      .getWindowCount(function(count) {
-        debug(count)
-      })
       .waitUntilTextExists('span.logo', 'Snappy Robotics', 60000)
   })
   /*

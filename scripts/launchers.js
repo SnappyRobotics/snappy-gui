@@ -10,30 +10,35 @@ const {
   BrowserWindow
 } = require('electron')
 
+// adds debug features like hotkeys for triggering dev tools and reload
+require('electron-debug')();
+
 var launchers = {
   quit: function() {
     var that = launchers
     if (process.platform !== 'darwin') {
-      that.app.quit()
+      app.quit()
     }
   },
   init: function() {
-    var that = launchers
+    var that = this
 
-    that.app = app
-    that.app.on('window-all-closed', () => {
+    app.on('window-all-closed', () => {
       that.quit()
-    })
+    });
 
-    that.app.on('ready', that.discovery)
-    that.app.on('activate', () => {
-      if (that.myWin === null) {
+    app.on('activate', () => {
+      if (!that.myWin) {
         that.discovery()
       }
-    })
+    });
+
+    app.on('ready', () => {
+      that.discovery()
+    });
   },
   discovery: function() {
-    var that = launchers
+    var that = this
 
     that.myWin = new BrowserWindow({
       name: "Discovery",
@@ -59,16 +64,16 @@ var launchers = {
     // win.webContents.openDevTools({
     //   // detach: true
     // });
-    that.myWin.on('closed', () => {
+    that.myWin.on('closed', function() {
+      debug("Closed window")
       that.quit()
     })
 
     const discover = require(path.join(__dirname, "..", "main_process", 'discover'));
 
     that.myWin.webContents.on('did-finish-load', function() {
-      setTimeout(function() {
-        that.myWin.show();
-      }, 40)
+      debug("loaded mainWin with discovery")
+      that.myWin.show()
     })
 
 
@@ -78,7 +83,6 @@ var launchers = {
 
         global.snappy_gui.core.start().then(function() {
           debug("Calling connect core to local core")
-
         })
       }
 
@@ -113,7 +117,8 @@ var launchers = {
     }, 2000);
   },
   core_view: function() {
-    var that = launchers
+    var that = this
+
     that.myWin.setSize(500, 400, true)
     that.myWin.setResizable(true)
     that.myWin.setMovable(true)
