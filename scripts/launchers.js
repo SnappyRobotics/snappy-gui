@@ -114,7 +114,9 @@ var launchers = {
       //e.returnValue = false
     }
 
-    const discover = require(path.join(__dirname, "..", "main_process", 'discover'));
+    const discovery = require(path.join(__dirname, "..", "scripts", 'discovery'));
+
+    discovery.init()
 
     that.myWin.webContents.on('did-finish-load', function() {
       debug("loaded mainWin with discovery")

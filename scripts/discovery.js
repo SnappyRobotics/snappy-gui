@@ -1,4 +1,11 @@
-"use strict";
+'use strict';
+
+const {
+  app,
+  ipcMain,
+  BrowserWindow
+} = require('electron')
+
 
 const req = require('req-fast')
 const path = require('path')
@@ -11,6 +18,55 @@ const bindCallback = require('when/node').bindCallback;
 const debug = require('debug')("snappy:gui:discovery")
 
 var discovery = {
+  init: function() {
+    var that = discovery
+    debug("discovery init")
+    ipcMain.on('discovery:start_scanning', that.start_scanning)
+
+    ipcMain.on('connect_core', function(event, arg) {
+      that.sending = false;
+    })
+  },
+  sending: true,
+  start_scanning: function(event, arg) {
+    var that = discovery
+
+    debug("autoscan started")
+    that.getRange().then(function(range) {
+      var ar = []
+      var retAr = []
+      range.unshift("127.0.0.1") //------------ adding localhost to first
+      for (var i = 0; i < range.length; i++) {
+        var promise = discovery.ping(range[i]);
+        promise.done(function(ip) {
+          if (that.sending) {
+            event.sender.send("discovery:searching", ip.ip)
+          }
+          if (ip.found) {
+            debug("Found Device at :", ip.ip)
+            retAr.push(ip.ip)
+            if (that.sending) {
+              event.sender.send("discovery:devices", retAr)
+            }
+          }
+        })
+        ar.push(promise)
+      }
+
+      var p = when.all(ar)
+      p.done(function(ot) {
+        debug("Scanning complete")
+        if (that.sending) {
+          event.sender.send("discovery:scan_done", retAr)
+        }
+      }, function(er) {
+        debug(er)
+        if (that.sending) {
+          event.sender.send("discovery:scan_done", er)
+        }
+      })
+    })
+  },
   ips: function(callback) {
     return bindCallback(when.promise(function(resolve, reject) {
       var interfaces = os.networkInterfaces()

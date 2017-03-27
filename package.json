@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "NODE_ENV=test DEBUG=snappy:* grunt test",
-    "start": "NODE_ENV=dev DEBUG=snappy:* electron main.js  --debug",
+    "start": "NODE_ENV=development DEBUG=snappy:* electron main.js  --debug",
     "postinstall": "./node_modules/.bin/bower install",
     "rebuild": "electron-rebuild -f -w serialport"
   },
@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/SnappyRobotics/snappy-gui#readme",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "bower": "^1.8.0",
     "electron-debug": "^1.1.0",
     "ip": "^1.1.5",
