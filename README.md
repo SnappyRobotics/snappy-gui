@@ -18,6 +18,6 @@ Development dependency check :
 [![npm](https://img.shields.io/npm/v/npm.svg)]()
 [![Bower](https://img.shields.io/bower/v/bootstrap.svg)]()
 
-[![GitHub tag](https://img.shields.io/github/tag/SnappyRobotics/snappy-gui.svg)](https://github.com/SnappyRobotics/snappy-gui
+[![GitHub tag](https://img.shields.io/github/tag/SnappyRobotics/snappy-gui.svg)](https://github.com/SnappyRobotics/snappy-gui)
 
 [![license](https://img.shields.io/github/license/SnappyRobotics/snappy-gui.svg)]()
