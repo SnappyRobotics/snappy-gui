@@ -78,14 +78,25 @@ var launchers = {
 
 
     ipcMain.on('start_core', function(event, arg) {
-      global.snappy_gui.core = require('snappy-core')
+      require(path.join(__dirname, 'discovery.js'))
+        .ping('127.0.0.1')
+        .then(function(ip) {
+          debug(ip)
+          if (!ip.found) {
+            global.snappy_gui.core = require('snappy-core')
 
-      global.snappy_gui.core.start().then(function() {
-        debug("local core started")
+            global.snappy_gui.core.start().then(function() {
+              debug("local core started")
 
-        global.snappy_gui.client_IP = '127.0.0.1'
-        that.progress_connecting()
-      })
+              global.snappy_gui.client_IP = '127.0.0.1'
+              that.progress_connecting()
+            })
+          } else {
+            debug("Already running core found on local system, connecting that")
+            global.snappy_gui.client_IP = '127.0.0.1'
+            that.progress_connecting()
+          }
+        })
     })
     ipcMain.on('connect_core', function(event, arg) {
       debug("Connecting to IP:", arg)
