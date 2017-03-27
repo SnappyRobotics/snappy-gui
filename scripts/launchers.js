@@ -6,6 +6,7 @@ const debug = require('debug')("snappy:gui:launchers")
 
 const {
   app,
+  dialog,
   ipcMain,
   BrowserWindow
 } = require('electron')
@@ -15,7 +16,6 @@ require('electron-debug')();
 
 var launchers = {
   quit: function() {
-    var that = launchers
     if (process.platform !== 'darwin') {
       app.quit()
     }
@@ -26,6 +26,11 @@ var launchers = {
     app.on('window-all-closed', () => {
       that.quit()
     });
+    app.on('before-quit', function() {
+      debug("before quit")
+      that.before_quit = true
+    });
+
 
     app.on('activate', () => {
       if (!that.myWin) {
@@ -69,14 +74,35 @@ var launchers = {
       //  that.quit()
     })
 
-    that.myWin.on('close', function() {
+    that.myWin.on('close', function(e) {
       debug("Closing... window")
+      /*setTimeout(function() {
+        if (!that.before_quit) {
+          dialog.showMessageBox(that.myWin, {
+            "type": "question",
+            "buttons": [
+              "Close without saving",
+              "Cancel"
+            ],
+            "defaultId": 1,
+            "title": "Unsaved changes",
+            "message": "Do you want to discard the changes you made?",
+            "detail": "Check the blue dots on the nodes for unsaved changes"
+          }, function(res) {
+            if (res == 0) { //Close without saving
+              process.exit(0)
+            } else {
+              return false
+            }
+          })
+        }
+      }, 500);
+      e.preventDefault();*/
     })
 
     that.myWin.on('unresponsive', function() {
       debug("unresponsive... window")
     })
-
 
     that.myWin.onbeforeunload = (e) => {
       debug('I do not want to be closed')
@@ -85,8 +111,9 @@ var launchers = {
       // a non-void value will silently cancel the close.
       // It is recommended to use the dialog API to let the user confirm closing the
       // application.
-      e.returnValue = false
+      //e.returnValue = false
     }
+
     const discover = require(path.join(__dirname, "..", "main_process", 'discover'));
 
     that.myWin.webContents.on('did-finish-load', function() {
@@ -97,24 +124,24 @@ var launchers = {
 
     ipcMain.on('start_core', function(event, arg) {
       require(path.join(__dirname, 'discovery.js'))
-        .ping('127.0.0.1')
-        .then(function(ip) {
-          debug(ip)
-          if (!ip.found) {
-            global.snappy_gui.core = require('snappy-core')
+      /*.ping('127.0.0.1')
+      .then(function(ip) {
+        debug(ip)
+        if (!ip.found) {*/
+      global.snappy_gui.core = require('snappy-core')
 
-            global.snappy_gui.core.start().then(function() {
-              debug("local core started")
+      global.snappy_gui.core.start().then(function() {
+        debug("local core started")
 
-              global.snappy_gui.client_IP = '127.0.0.1'
-              that.progress_connecting()
-            })
-          } else {
-            debug("Already running core found on local system, connecting that")
-            global.snappy_gui.client_IP = '127.0.0.1'
-            that.progress_connecting()
-          }
-        })
+        global.snappy_gui.client_IP = '127.0.0.1'
+        that.progress_connecting()
+      })
+      /*  } else {
+          debug("Already running core found on local system, connecting that")
+          global.snappy_gui.client_IP = '127.0.0.1'
+          that.progress_connecting()
+        }
+      })*/
     })
     ipcMain.on('connect_core', function(event, arg) {
       debug("Connecting to IP:", arg)
