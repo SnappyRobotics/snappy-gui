@@ -2,14 +2,16 @@
 
 const {
   app,
+  dialog,
   ipcMain,
   BrowserWindow
 } = require('electron')
 
 
+const Promise = require('bluebird')
 const req = require('req-fast')
 const path = require('path')
-const Promise = require('bluebird')
+const url = require('url')
 const fs = require('fs')
 const os = require('os')
 
@@ -30,6 +32,23 @@ var discovery = {
   init: function() {
     var that = discovery
     debug("discovery init")
+
+    app.on('before-quit', function() {
+      debug("before quit")
+    });
+
+
+    app.on('activate', () => {
+      if (!that.myWin) {
+        that.createWindow()
+      }
+    });
+
+    app.on('ready', () => {
+      that.createWindow()
+    });
+
+
     ipcMain.on('discovery:start_scanning', that.start_scanning)
     setTimeout(function() {
       if (that.allPromises) {
@@ -39,13 +58,98 @@ var discovery = {
       }
     }, 4000);
 
-    ipcMain.on('connect_core', function(event, arg) {
+    ipcMain.on('discovery:connect_core', function(event, arg) {
       debug("received connect_core ipc event")
-      // that.sending = false;
       if (that.allPromises) {
         that.allPromises.cancel()
       }
     })
+  },
+  createWindow: function() {
+    var that = discovery
+
+    that.myWin = new BrowserWindow({
+      name: "Discovery",
+      title: "Discovery",
+      frame: true,
+      resizable: true,
+      width: 600,
+      height: 400,
+      webPreferences: {
+        nodeIntegration: false,
+        preload: path.join(__dirname, '..', 'renderer', "preload.js")
+      },
+      show: false
+    })
+
+    that.myWin.loadURL(url.format({
+      pathname: path.join(__dirname, '..', 'renderer', 'discovery.html'),
+      protocol: 'file:',
+      slashes: true
+    }))
+
+    // Chrome developer tools
+    // win.webContents.openDevTools({
+    //   // detach: true
+    // });
+
+    that.myWin.on('closed', function() {
+      debug("Closed window")
+    })
+
+    that.myWin.on('close', function(e) {
+      debug("Closing... window")
+    })
+
+
+    that.myWin.on('unresponsive', function() {
+      debug("unresponsive... window")
+    })
+
+    that.myWin.onbeforeunload = function(e) {
+      debug('I do not want to be closed')
+    }
+
+    that.myWin.webContents.on('did-finish-load', function() {
+      debug("loaded myWin with discovery")
+      that.myWin.show()
+    })
+
+    ipcMain.on('discovery:start_core', that.start_core)
+
+    ipcMain.on('discovery:connect_core', that.connect_core)
+  },
+  start_core: function(event, arg) {
+    var that = discovery
+    require(path.join(__dirname, 'discovery.js'))
+    that.isPortTaken(function(err, ans) {
+      if (ans) {
+        event.sender.send("discovery:cancel_start_core")
+        dialog.showMessageBox(that.myWin, {
+          "type": "error",
+          "buttons": [
+            "OK"
+          ],
+          "defaultId": 0,
+          "title": "uncaughtException Error",
+          "message": "Error! Port already in use :" + global.snappy_gui.client_PORT
+        })
+      } else {
+        global.snappy_gui.core = require('snappy-core')
+        global.snappy_gui.core.start().then(function() {
+          debug("local core started")
+
+          global.snappy_gui.client_IP = '127.0.0.1'
+          // that.progress_connecting()
+        })
+      }
+    })
+  },
+  connect_core: function(event, arg) {
+    debug("Connecting to IP:", arg)
+
+    global.snappy_gui.client_IP = arg
+    //  that.progress_connecting()
   },
   allPromises: null,
   sending: true,
@@ -203,6 +307,23 @@ var discovery = {
         rs.abort()
       })
     })
+  },
+  isPortTaken: function(fn) {
+    var net = require('net')
+    var tester = net.createServer()
+      .once('error', function(err) {
+        if (err.code != 'EADDRINUSE') return fn(err)
+
+        debug("Error! Port already in use :", global.snappy_gui.client_PORT)
+        fn(null, true)
+      })
+      .once('listening', function() {
+        tester.once('close', function() {
+            fn(null, false)
+          })
+          .close()
+      })
+      .listen(global.snappy_gui.client_PORT)
   }
 }
 

@@ -74,8 +74,47 @@ var launchers = {
       //  that.quit()
     })
 
+    process.on('uncaughtException', function(err) {
+      if (err.errno === 'EADDRINUSE') {
+        debug("Error! Port already in use :", global.snappy_core.PORT)
+        debug(err)
+        dialog.showMessageBox(that.myWin, {
+          "type": "error",
+          "buttons": [
+            "OK"
+          ],
+          "defaultId": 0,
+          "title": "uncaughtException Error",
+          "message": "Error! Port already in use :" + global.snappy_core.PORT
+        }, function(res) {
+          that.myWin.hide()
+          delete that.myWin
+          that.discovery()
+        })
+      } else {
+        dialog.showMessageBox(that.myWin, {
+          "type": "error",
+          "buttons": [
+            "OK"
+          ],
+          "defaultId": 0,
+          "title": "uncaughtException Error",
+          "message": err.message
+        }, function(res) {})
+        //console.log(err);
+      }
+      //    process.exit(1);
+    });
+
+
     that.myWin.on('close', function(e) {
       debug("Closing... window")
+
+      //debug(that.myWin) //.getElementById('btn-deploy').className)
+
+      let contents = that.myWin.webContents
+
+      //debug(contents)
       /*setTimeout(function() {
         if (!that.before_quit) {
           dialog.showMessageBox(that.myWin, {
@@ -119,7 +158,7 @@ var launchers = {
     discovery.init()
 
     that.myWin.webContents.on('did-finish-load', function() {
-      debug("loaded mainWin with discovery")
+      debug("loaded myWin with discovery")
       that.myWin.show()
     })
 
@@ -130,6 +169,7 @@ var launchers = {
       .then(function(ip) {
         debug(ip)
         if (!ip.found) {*/
+
       global.snappy_gui.core = require('snappy-core')
 
       global.snappy_gui.core.start().then(function() {

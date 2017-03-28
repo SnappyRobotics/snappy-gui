@@ -19,6 +19,10 @@ debug("\t\t\t\t    " + global.snappy_gui.package.description)
 debug("\t\t\t\t\t" + global.snappy_gui.package.version)
 debug("==========================================================================")
 
-const launchers = require(path.join(__dirname, 'scripts', 'launchers'))
+// const launchers = require(path.join(__dirname, 'scripts', 'launchers'))
+//
+// launchers.init()
 
-launchers.init()
+const discovery = require(path.join(__dirname, 'scripts', 'discovery'))
+
+discovery.init()
