@@ -62,6 +62,7 @@ module.exports = function(grunt) {
       functions: {
         options: {
           reporter: 'spec',
+          //  captureFile: 'results.txt', // Optionally capture the reporter output to a file
           require: 'babel-register'
         },
         src: ['test/functions/*_spec.js']
