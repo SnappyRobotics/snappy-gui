@@ -1,8 +1,11 @@
 "use strict";
 
-const path = require('path')
+const {
+  app
+} = require('electron')
 
 const fs = require('fs')
+const path = require('path')
 
 const debug = require('debug')("snappy:gui:index")
 
@@ -20,6 +23,28 @@ debug("\t\t\t\t    " + global.snappy_gui.package.description)
 debug("\t\t\t\t\t" + global.snappy_gui.package.version)
 debug("==========================================================================")
 
-const launchers = require(path.join(__dirname, 'scripts', 'launchers'))
 
-launchers.init()
+global.snappy_gui.app = app
+global.snappy_gui.discovery = require(path.join(__dirname, 'scripts', 'discovery'))
+global.snappy_gui.mainWindow = require(path.join(__dirname, 'scripts', 'mainWindow'))
+
+//===============================================================================
+if (!global.window) {
+  global.window = ['discovery', 'mainWindow'][0]
+}
+
+app.on('activate', () => {
+  if (!global.snappy_gui[global.window].win) {
+    global.snappy_gui[global.window].createWindow()
+  }
+});
+
+app.on('ready', () => {
+  global.snappy_gui[global.window].createWindow()
+});
+
+global.snappy_gui.quit = function() {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+}

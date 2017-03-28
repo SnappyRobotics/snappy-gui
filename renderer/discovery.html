@@ -54,7 +54,7 @@
 			</md-button>
 
 			<md-list flex>
-				<md-subheader class="md-no-sticky">Devices (
+				<md-subheader class="md-no-sticky">Devices found (
 					<span id="devices_count">{{devices.length}}</span>):</md-subheader>
 				<md-list-item ng-repeat="ip in devices" layout="row">
 					<h3>{{ip}}</h3>
@@ -81,17 +81,22 @@
 
 					$scope.start_core = function() {
 						$scope.connecting = true
-						ipc.send('start_core');
+						ipc.send('discovery:start_core');
 					}
 
 					$scope.connect = function(ip) {
 						$scope.connecting = true
-						ipc.send('connect_core', ip);
+						ipc.send('discovery:connect_core', ip);
 					}
 
 					$scope.cancelLoading = function() {
-						ipc.send('cancel_loading_core');
+						ipc.send('discovery:cancel_loading_core');
 					}
+
+
+					ipc.on("discovery:cancel_start_core", function(em, devices) {
+						$scope.connecting = false
+					})
 
 					$scope.start_scanning = function() {
 						ipc.send('discovery:start_scanning');

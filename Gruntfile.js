@@ -22,7 +22,11 @@ module.exports = function(grunt) {
         'freeze': true,
         'latedef': true,
         'maxerr': 2,
-        'bitwise': true
+        'bitwise': true,
+        "globals": {
+          "Promise": true,
+          "$": false
+        }
       },
       main_process: {
         files: {
@@ -56,7 +60,7 @@ module.exports = function(grunt) {
     },
     simplemocha: {
       all: {
-        src: ['test/**/*.js']
+        src: ['test/**/*_spec.js']
       }
     }
   });
