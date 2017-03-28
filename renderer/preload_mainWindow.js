@@ -1,3 +1,5 @@
+'use strict';
+
 require('./preload.js')
 
 window.isDeployed = function() {

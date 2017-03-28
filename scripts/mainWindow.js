@@ -81,7 +81,7 @@ var mainWindow = {
             "message": "Do you want to discard the changes you made?",
             "detail": "Check the blue dots on the nodes for unsaved changes"
           }, function(res) {
-            if (res == 0) { //Close without saving
+            if (res + '' === '0') { //Close without saving
               debug("Dont want to save, hence closing")
               that.win.destroy()
             } else {
