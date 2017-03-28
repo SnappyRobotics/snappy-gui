@@ -85,6 +85,10 @@ var mainWindow = {
     that.win.webContents.on('did-finish-load', function() {
       debug('Loaded main Window')
       that.win.show()
+      if (global.snappy_gui.discovery.win) {
+        global.snappy_gui.discovery.win.close()
+        delete global.snappy_gui.discovery.win
+      }
       // that.win.maximize()
     })
   }

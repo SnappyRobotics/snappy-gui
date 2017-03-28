@@ -78,8 +78,8 @@ var discovery = {
       if (ans) {
         event.sender.send("discovery:cancel_start_core")
 
-        var promise = discovery.ping('127.0.0.1'); // force check localhost
-        promise.then(function(ip) {
+        that.forcedLocalPromise = discovery.ping('127.0.0.1'); // force check localhost
+        that.forcedLocalPromise.then(function(ip) {
           event.sender.send("discovery:searching", ip.ip)
           if (ip.found) {
             debug("Found Device at :", ip.ip)
@@ -113,6 +113,7 @@ var discovery = {
 
     debug("Connecting to IP:", arg)
     if (that.allPromises) {
+      that.forcedLocalPromise.cancel()
       that.allPromises.cancel()
     }
 

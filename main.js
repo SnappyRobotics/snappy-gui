@@ -38,11 +38,11 @@ app.on('before-quit', function() {
 });
 
 app.on('activate', () => {
-  if (!global.snappy_gui.mainWindow.win) {
-    global.snappy_gui.mainWindow.createWindow()
+  if (!global.snappy_gui.discovery.win) {
+    global.snappy_gui.discovery.createWindow()
   }
 });
 
 app.on('ready', () => {
-  global.snappy_gui.mainWindow.createWindow()
+  global.snappy_gui.discovery.createWindow()
 });
