@@ -8,6 +8,7 @@ const chaiAsPromised = require('chai-as-promised')
 const expect = chai.expect;
 
 const main = require(path.join(__dirname, '..', '..', 'main'));
+const discovery = require(path.join(__dirname, '..', '..', 'scripts', 'discovery'))
 
 const debug = require('debug')("snappy:gui:test:functions:discovery_spec")
 
@@ -30,13 +31,70 @@ describe('Discovery class functions', function() {
     const discovery = require(path.join(__dirname, '..', '..', 'scripts', 'discovery'))
     discovery.ping('127.0.0.1')
       .then(function(ip) {
-        debug(ip)
         expect(ip).to.be.an('object')
-        expect(ip).to.have.property('ip')
-        expect(ip).to.have.property('found')
-        expect(ip.ip).to.be.equal('127.0.0.1')
-        expect(ip.found).to.be.true
+        expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
+        expect(ip).to.have.property('found').that.is.a('boolean').which.is.true
         done()
       })
+  })
+
+  it('Test getRange function', function(done) {
+    discovery.getRange('127.0.0.1')
+      .then(function(ips) {
+        expect(ips).to.be.an('array')
+
+        var arr = []
+        for (var i = 0; i < ips.length; i++) {
+          if (ips[i].match(/192.168.108.([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5])/)) {
+            arr.push(ips[i])
+          }
+        }
+        expect(arr.length).to.be.equal(253) //our netmask generates 253 IPs
+        done()
+      })
+  })
+
+  it('Check ping for many existing nodes', function(done) {
+    //this.timeout(10000)
+    nock(/192.168.108.([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]):8000/)
+      .get('/info')
+      .times(290)
+      .reply(200, {
+        name: "Snappy Robotics Software",
+        version: '1.0.2',
+        description: 'sdf .....',
+        snappy: true
+      })
+
+
+    discovery.getRange().then(function(range) {
+      var ar = []
+      var retAr = []
+      //range.unshift("127.0.0.1") //------------ adding localhost to first
+      var arr = [] // only get our ranges
+      for (var j = 0; j < range.length; j++) {
+        if (range[j].match(/192.168.108.([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5])/)) {
+          arr.push(range[j])
+        }
+      }
+      for (var i = 0; i < arr.length; i++) {
+        var promise = discovery.ping(arr[i]);
+        promise.then(function(ip) {
+          if (ip.found) {
+            // debug("Found Device at :", ip.ip)
+            retAr.push(ip.ip)
+          }
+        })
+        ar.push(promise)
+      }
+
+      var allPromises = Promise.all(ar)
+      allPromises
+        .then(function(ot) {
+          debug("Scanning complete")
+          debug(retAr)
+          done()
+        })
+    })
   })
 })

@@ -219,6 +219,13 @@ var discovery = {
           addresses[i].netmask = "255.255.255.255";
         }
       }
+      if (process.env.NODE_ENV === 'test') { // Add IP series for testing
+        addresses.push({
+          address: '192.168.108.1',
+          netmask: '255.255.255.0'
+        })
+      }
+
       debug("Network Interfaces :", addresses)
       resolve(addresses)
     })
