@@ -58,27 +58,27 @@ module.exports = function(grunt) {
         }
       }
     },
-    simplemocha: {
-      all: {
-        src: ['test/**/*_spec.js']
-      }
-    },
     mochaTest: {
-      test: {
+      functions: {
+        options: {
+          reporter: 'spec',
+          require: 'babel-register'
+        },
+        src: ['test/functions/*_spec.js']
+      },
+      gui: {
         options: {
           reporter: 'spec'
         },
-        src: ['test/**/*.js']
+        src: ['test/gui/*_spec.js']
       }
     }
   })
-  //grunt.loadTasks('tasks')
 
   grunt.loadNpmTasks('grunt-contrib-jshint')
-  grunt.loadNpmTasks('grunt-simple-mocha');
-  grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-mocha-test')
 
 
   grunt.registerTask('default', ['test'])
-  grunt.registerTask('test', ['jshint', 'mochaTest'])
+  grunt.registerTask('test', ['jshint', 'mochaTest:functions'])
 }

@@ -21,6 +21,11 @@
   ],
   "author": "Prajankya",
   "license": "GPL-3.0",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "bugs": {
     "url": "https://github.com/SnappyRobotics/snappy-gui/issues"
   },
@@ -38,6 +43,8 @@
     "when": "^3.7.8"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.24.0",
+    "babel-register": "^6.24.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "devtron": "^1.4.0",
@@ -47,7 +54,6 @@
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-mocha-test": "^0.13.2",
-    "grunt-simple-mocha": "^0.4.1",
     "nock": "^9.0.9",
     "spectron": "^3.6.0"
   }
