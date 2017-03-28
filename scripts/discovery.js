@@ -125,6 +125,16 @@ var discovery = {
     that.isPortTaken(function(err, ans) {
       if (ans) {
         event.sender.send("discovery:cancel_start_core")
+
+        var promise = discovery.ping('127.0.0.1'); // force check localhost
+        promise.then(function(ip) {
+          event.sender.send("discovery:searching", ip.ip)
+          if (ip.found) {
+            debug("Found Device at :", ip.ip)
+            event.sender.send("discovery:devices", [ip.ip])
+          }
+        })
+
         dialog.showMessageBox(that.myWin, {
           "type": "error",
           "buttons": [
@@ -140,16 +150,45 @@ var discovery = {
           debug("local core started")
 
           global.snappy_gui.client_IP = '127.0.0.1'
-          // that.progress_connecting()
+          that.progress_connecting()
         })
       }
     })
   },
   connect_core: function(event, arg) {
+    var that = discovery
     debug("Connecting to IP:", arg)
 
     global.snappy_gui.client_IP = arg
-    //  that.progress_connecting()
+    that.progress_connecting()
+  },
+  progress_connecting: function() {
+    var that = discovery
+
+    debug("progress connecting")
+    that.myWin.setContentSize(200, 150)
+    that.myWin.setResizable(false)
+    that.myWin.setMovable(false)
+    that.myWin.setMaximizable(false)
+    that.myWin.setMinimizable(false)
+    that.myWin.setFullScreenable(false)
+    that.myWin.setClosable(false)
+    that.myWin.setAlwaysOnTop(true)
+    that.myWin.center()
+    that.myWin.setProgressBar(2, 'indeterminate')
+    that.myWin.setMenuBarVisibility(false)
+    that.myWin.setTitle("Connecting")
+
+    ipcMain.on('cancel_loading_core', function(event, arg) {
+      that.quit()
+    })
+
+    setTimeout(function() {
+      const mainWindow = require('./mainWindow');
+      mainWindow.myWin = that.myWin
+      mainWindow.createWindow()
+      // that.core_view()
+    }, 2000);
   },
   allPromises: null,
   sending: true,
@@ -312,7 +351,9 @@ var discovery = {
     var net = require('net')
     var tester = net.createServer()
       .once('error', function(err) {
-        if (err.code != 'EADDRINUSE') return fn(err)
+        if (err.code != 'EADDRINUSE') {
+          return fn(err)
+        }
 
         debug("Error! Port already in use :", global.snappy_gui.client_PORT)
         fn(null, true)
