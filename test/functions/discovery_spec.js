@@ -3,12 +3,21 @@
 const nock = require('nock')
 const path = require('path')
 const fs = require('fs')
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
+const expect = chai.expect;
+
+const main = require(path.join(__dirname, '..', '..', 'main'));
 
 const debug = require('debug')("snappy:gui:test:functions:discovery_spec")
 
 describe('Discovery class functions', function() {
+  before(function() {
+    chai.expect()
+    chai.use(chaiAsPromised)
+  })
 
-  it('find local node', function(done) {
+  it('Test Ping function', function(done) {
     nock('http://127.0.0.1:8000')
       .get('/info')
       .reply(200, {
@@ -17,12 +26,17 @@ describe('Discovery class functions', function() {
         description: 'sdf .....',
         snappy: true
       })
+
     const discovery = require(path.join(__dirname, '..', '..', 'scripts', 'discovery'))
-    done()
-    /*discovery.ping('127.0.0.1')
+    discovery.ping('127.0.0.1')
       .then(function(ip) {
         debug(ip)
+        expect(ip).to.be.an('object')
+        expect(ip).to.have.property('ip')
+        expect(ip).to.have.property('found')
+        expect(ip.ip).to.be.equal('127.0.0.1')
+        expect(ip.found).to.be.true
         done()
-      })*/
+      })
   })
 })

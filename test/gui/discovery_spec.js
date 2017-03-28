@@ -28,7 +28,7 @@ describe('Snappy GUI', function() {
   afterEach(function() {
     return helpers.stopApplication(app)
   })
-  /*
+
   it('opens discovery window with no clients', function() {
     return app.client
       .getMainProcessLogs().then(debug)
@@ -45,9 +45,7 @@ describe('Snappy GUI', function() {
       .getTitle().should.eventually.be.equal("Discovery Wizard")
       .getText('#devices_count').should.eventually.equal('0')
   })
-  */
 
-  /*
   it('click locally button and then click cancel', function() {
     return app.client
       .getMainProcessLogs().then(debug)
@@ -67,6 +65,4 @@ describe('Snappy GUI', function() {
       .pause(1400)
       .click('#cancelConnectingBtn')
   })
-  */
-
 })

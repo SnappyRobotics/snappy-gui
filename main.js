@@ -33,18 +33,20 @@ if (!global.window) {
   global.window = ['discovery', 'mainWindow'][0]
 }
 
-app.on('activate', () => {
-  if (!global.snappy_gui[global.window].win) {
+if (process.env.NODE_ENV != 'test') {
+  app.on('activate', () => {
+    if (!global.snappy_gui[global.window].win) {
+      global.snappy_gui[global.window].createWindow()
+    }
+  });
+
+  app.on('ready', () => {
     global.snappy_gui[global.window].createWindow()
-  }
-});
+  });
 
-app.on('ready', () => {
-  global.snappy_gui[global.window].createWindow()
-});
-
-global.snappy_gui.quit = function() {
-  if (process.platform !== 'darwin') {
-    app.quit()
+  global.snappy_gui.quit = function() {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
   }
 }
