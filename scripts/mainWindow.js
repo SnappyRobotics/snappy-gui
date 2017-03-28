@@ -73,7 +73,6 @@ var mainWindow = {
       debug("Closing... mainWindow")
     })
 
-
     that.win.on('unresponsive', function() {
       debug("unresponsive... mainWindow")
     })
@@ -85,6 +84,11 @@ var mainWindow = {
     that.win.webContents.on('did-finish-load', function() {
       debug('Loaded main Window')
       that.win.show()
+
+      that.win.webContents.executeJavaScript('window.myOnWindowLoad()', function(answer) {
+        console.log('answer', answer); // never gets executed
+      });
+
       if (global.snappy_gui.discovery.win) {
         global.snappy_gui.discovery.win.close()
         delete global.snappy_gui.discovery.win
