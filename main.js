@@ -1,10 +1,7 @@
 "use strict";
 
 const {
-  app,
-  dialog,
-  ipcMain,
-  BrowserWindow
+  app
 } = require('electron')
 
 const fs = require('fs')
@@ -32,15 +29,18 @@ global.snappy_gui.discovery = require(path.join(__dirname, 'scripts', 'discovery
 global.snappy_gui.mainWindow = require(path.join(__dirname, 'scripts', 'mainWindow'))
 
 //===============================================================================
+if (!global.window) {
+  global.window = ['discovery', 'mainWindow'][0]
+}
 
 app.on('activate', () => {
-  if (!global.snappy_gui.discovery.win) {
-    global.snappy_gui.discovery.createWindow()
+  if (!global.snappy_gui[global.window].win) {
+    global.snappy_gui[global.window].createWindow()
   }
 });
 
 app.on('ready', () => {
-  global.snappy_gui.discovery.createWindow()
+  global.snappy_gui[global.window].createWindow()
 });
 
 global.snappy_gui.quit = function() {
