@@ -10,9 +10,11 @@ const debug = require('debug')("snappy:gui:test:discovery_spec")
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
 
-  process.env.CI = true
+  //process.env.CI = true
 
   var app = null
+
+  global.window = 'discovery'
 
   beforeEach(function() {
     return helpers.startApplication({
@@ -42,4 +44,25 @@ describe('Snappy GUI', function() {
       .getTitle().should.eventually.be.equal("Discovery Wizard")
       .getText('#devices_count').should.eventually.equal('0')
   })
+
+  it('click locally button and then click cancel', function() {
+    return app.client
+      .getMainProcessLogs().then(debug)
+      .getRenderProcessLogs().then(debug)
+      .waitUntilWindowLoaded()
+      .getWindowCount().should.eventually.equal(1)
+      .browserWindow.focus()
+      .browserWindow.isMinimized().should.eventually.be.false
+      .browserWindow.isDevToolsOpened().should.eventually.be.false
+      .browserWindow.isVisible().should.eventually.be.true
+      .browserWindow.isFocused().should.eventually.be.true
+      .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
+      .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
+      .getTitle().should.eventually.be.equal("Discovery Wizard")
+      .getText('#devices_count').should.eventually.equal('0')
+      .click("#localBtn")
+      .pause(1400)
+      .click('#cancelConnectingBtn')
+  })
+
 })
