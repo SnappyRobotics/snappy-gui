@@ -274,7 +274,6 @@ var discovery = {
         }
       }, function(err, resp) {
         if (err) {
-          //throw err
           resolve({
             ip: ip,
             found: false
@@ -294,7 +293,6 @@ var discovery = {
             found: false
           })
         }
-        //debug(resp)
       })
       onCancel(function() {
         rs.abort()

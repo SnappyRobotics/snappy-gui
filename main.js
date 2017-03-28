@@ -33,16 +33,18 @@ global.snappy_gui.mainWindow = require(path.join(__dirname, 'scripts', 'mainWind
 
 //===============================================================================
 
-app.on('before-quit', function() {
-  debug("before quit")
-});
-
 app.on('activate', () => {
-  if (!global.snappy_gui.mainWindow.win) {
-    global.snappy_gui.mainWindow.createWindow()
+  if (!global.snappy_gui.discovery.win) {
+    global.snappy_gui.discovery.createWindow()
   }
 });
 
 app.on('ready', () => {
-  global.snappy_gui.mainWindow.createWindow()
+  global.snappy_gui.discovery.createWindow()
 });
+
+global.snappy_gui.quit = function() {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+}

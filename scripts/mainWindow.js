@@ -65,10 +65,6 @@ var mainWindow = {
     debug('Loading : ', u)
     that.win.loadURL(u)
 
-    that.win.on('closed', function() {
-      debug("Closed mainWindow")
-    })
-
     that.win.on('close', function(e) {
       debug("Closing... mainWindow")
       that.win.webContents.executeJavaScript('window.isDeployed()', function(deployed) {
@@ -100,10 +96,6 @@ var mainWindow = {
     that.win.on('unresponsive', function() {
       debug("unresponsive... mainWindow")
     })
-
-    that.win.onbeforeunload = function(e) {
-      debug('I do not want to be closed')
-    }
 
     that.win.webContents.on('did-finish-load', function() {
       debug('Loaded main Window')
