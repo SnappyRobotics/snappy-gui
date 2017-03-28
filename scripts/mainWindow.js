@@ -1,5 +1,6 @@
 'use strict';
 
+const electron = require('electron')
 const {
   app,
   dialog,
@@ -30,23 +31,30 @@ Promise.config({
 
 var mainWindow = {
   createWindow: function() {
-    var that = this
+    var that = mainWindow
 
-    that.myWin.setSize(500, 400, true)
-    that.myWin.setResizable(true)
-    that.myWin.setMovable(true)
-    that.myWin.setMaximizable(true)
-    that.myWin.setMinimizable(true)
-    that.myWin.setFullScreenable(true)
-    that.myWin.setClosable(true)
-    that.myWin.setAlwaysOnTop(false)
-    that.myWin.center()
-    that.myWin.maximize()
-    that.myWin.setProgressBar(-1)
-    that.myWin.setMenuBarVisibility(true)
-    that.myWin.setTitle("Snappy Robotics")
+    debug("createWindow of mainWindow")
 
-    debug("Building coreWin")
+    if (!global.snappy_gui.client_IP) {
+      global.snappy_gui.client_IP = '127.0.0.1'
+    }
+
+    const {
+      width,
+      height
+    } = electron.screen.getPrimaryDisplay().workAreaSize
+
+    that.win = new BrowserWindow({
+      title: "Snappy Robotics",
+      webPreferences: {
+        nodeIntegration: false,
+        preload: path.join(__dirname, '..', 'renderer', "preload_mainWindow.js")
+      },
+      width: width,
+      height: height,
+      center: true,
+      show: false
+    })
 
     var u = url.format({
       pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/red",
@@ -54,14 +62,31 @@ var mainWindow = {
       slashes: true
     })
 
-    debug(u)
-    that.myWin.loadURL(u)
+    debug('Loading : ', u)
+    that.win.loadURL(u)
 
-    that.myWin.webContents.on('did-finish-load', function() {
-      debug('Loaded content')
+    that.win.on('closed', function() {
+      debug("Closed mainWindow")
     })
 
-    debug('Loading')
+    that.win.on('close', function(e) {
+      debug("Closing... mainWindow")
+    })
+
+
+    that.win.on('unresponsive', function() {
+      debug("unresponsive... mainWindow")
+    })
+
+    that.win.onbeforeunload = function(e) {
+      debug('I do not want to be closed')
+    }
+
+    that.win.webContents.on('did-finish-load', function() {
+      debug('Loaded main Window')
+      that.win.show()
+      // that.win.maximize()
+    })
   }
 }
 module.exports = mainWindow

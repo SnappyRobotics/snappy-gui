@@ -29,46 +29,13 @@ Promise.config({
 });
 
 var discovery = {
-  init: function() {
-    var that = discovery
-    debug("discovery init")
-
-    app.on('before-quit', function() {
-      debug("before quit")
-    });
-
-
-    app.on('activate', () => {
-      if (!that.myWin) {
-        that.createWindow()
-      }
-    });
-
-    app.on('ready', () => {
-      that.createWindow()
-    });
-
-
-    ipcMain.on('discovery:start_scanning', that.start_scanning)
-    setTimeout(function() {
-      if (that.allPromises) {
-        that.allPromises.cancel()
-      } else {
-        debug("No Promise found")
-      }
-    }, 4000);
-
-    ipcMain.on('discovery:connect_core', function(event, arg) {
-      debug("received connect_core ipc event")
-      if (that.allPromises) {
-        that.allPromises.cancel()
-      }
-    })
+  quit: function() {
+    global.snappy_gui.quit()
   },
   createWindow: function() {
     var that = discovery
 
-    that.myWin = new BrowserWindow({
+    that.win = new BrowserWindow({
       name: "Discovery",
       title: "Discovery",
       frame: true,
@@ -82,7 +49,7 @@ var discovery = {
       show: false
     })
 
-    that.myWin.loadURL(url.format({
+    that.win.loadURL(url.format({
       pathname: path.join(__dirname, '..', 'renderer', 'discovery.html'),
       protocol: 'file:',
       slashes: true
@@ -93,31 +60,16 @@ var discovery = {
     //   // detach: true
     // });
 
-    that.myWin.on('closed', function() {
-      debug("Closed window")
-    })
-
-    that.myWin.on('close', function(e) {
-      debug("Closing... window")
-    })
-
-
-    that.myWin.on('unresponsive', function() {
-      debug("unresponsive... window")
-    })
-
-    that.myWin.onbeforeunload = function(e) {
-      debug('I do not want to be closed')
-    }
-
-    that.myWin.webContents.on('did-finish-load', function() {
-      debug("loaded myWin with discovery")
-      that.myWin.show()
+    that.win.webContents.on('did-finish-load', function() {
+      debug("loaded win with discovery")
+      that.win.show()
     })
 
     ipcMain.on('discovery:start_core', that.start_core)
 
     ipcMain.on('discovery:connect_core', that.connect_core)
+
+    ipcMain.on('discovery:start_scanning', that.start_scanning)
   },
   start_core: function(event, arg) {
     var that = discovery
@@ -135,7 +87,7 @@ var discovery = {
           }
         })
 
-        dialog.showMessageBox(that.myWin, {
+        dialog.showMessageBox(that.win, {
           "type": "error",
           "buttons": [
             "OK"
@@ -157,7 +109,12 @@ var discovery = {
   },
   connect_core: function(event, arg) {
     var that = discovery
+    debug("received connect_core ipc event")
+
     debug("Connecting to IP:", arg)
+    if (that.allPromises) {
+      that.allPromises.cancel()
+    }
 
     global.snappy_gui.client_IP = arg
     that.progress_connecting()
@@ -166,32 +123,28 @@ var discovery = {
     var that = discovery
 
     debug("progress connecting")
-    that.myWin.setContentSize(200, 150)
-    that.myWin.setResizable(false)
-    that.myWin.setMovable(false)
-    that.myWin.setMaximizable(false)
-    that.myWin.setMinimizable(false)
-    that.myWin.setFullScreenable(false)
-    that.myWin.setClosable(false)
-    that.myWin.setAlwaysOnTop(true)
-    that.myWin.center()
-    that.myWin.setProgressBar(2, 'indeterminate')
-    that.myWin.setMenuBarVisibility(false)
-    that.myWin.setTitle("Connecting")
+    that.win.setContentSize(200, 150)
+    that.win.setResizable(false)
+    that.win.setMovable(false)
+    that.win.setMaximizable(false)
+    that.win.setMinimizable(false)
+    that.win.setFullScreenable(false)
+    that.win.setClosable(false)
+    that.win.setAlwaysOnTop(true)
+    that.win.center()
+    that.win.setProgressBar(2, 'indeterminate')
+    that.win.setMenuBarVisibility(false)
+    that.win.setTitle("Connecting")
 
     ipcMain.on('cancel_loading_core', function(event, arg) {
       that.quit()
     })
 
     setTimeout(function() {
-      const mainWindow = require('./mainWindow');
-      mainWindow.myWin = that.myWin
-      mainWindow.createWindow()
+      global.snappy_gui.mainWindow.createWindow()
       // that.core_view()
     }, 2000);
   },
-  allPromises: null,
-  sending: true,
   start_scanning: function(event, arg) {
     var that = discovery
 
