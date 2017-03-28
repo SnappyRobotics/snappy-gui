@@ -24,7 +24,8 @@ module.exports = function(grunt) {
         'maxerr': 2,
         'bitwise': true,
         "globals": {
-          "Promise": true
+          "Promise": true,
+          "$": false
         }
       },
       main_process: {
@@ -59,7 +60,7 @@ module.exports = function(grunt) {
     },
     simplemocha: {
       all: {
-        src: ['test/**/*.js']
+        src: ['test/**/*_spec.js']
       }
     }
   });
