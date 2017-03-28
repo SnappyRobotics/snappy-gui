@@ -1,5 +1,5 @@
 require('./preload.js')
 
-window.myOnWindowLoad = function() {
-  require('./postLoad_mainWindow.js')
+window.isDeployed = function() {
+  return ($("#btn-deploy").attr("class").indexOf('disabled') > -1);
 }

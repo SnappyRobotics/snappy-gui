@@ -71,6 +71,30 @@ var mainWindow = {
 
     that.win.on('close', function(e) {
       debug("Closing... mainWindow")
+      that.win.webContents.executeJavaScript('window.isDeployed()', function(deployed) {
+        debug('isDeployed:', deployed);
+        if (!deployed) {
+          dialog.showMessageBox(that.win, {
+            "type": "question",
+            "buttons": [
+              "Close without saving",
+              "Cancel"
+            ],
+            "defaultId": 1,
+            "title": "Unsaved changes",
+            "message": "Do you want to discard the changes you made?",
+            "detail": "Check the blue dots on the nodes for unsaved changes"
+          }, function(res) {
+            if (res == 0) { //Close without saving
+              debug("Dont want to save, hence closing")
+              that.win.destroy()
+            } else {
+              debug("Preventing default for closing")
+              e.preventDefault()
+            }
+          })
+        }
+      });
     })
 
     that.win.on('unresponsive', function() {
@@ -85,15 +109,10 @@ var mainWindow = {
       debug('Loaded main Window')
       that.win.show()
 
-      that.win.webContents.executeJavaScript('window.myOnWindowLoad()', function(answer) {
-        console.log('answer', answer); // never gets executed
-      });
-
       if (global.snappy_gui.discovery.win) {
         global.snappy_gui.discovery.win.close()
         delete global.snappy_gui.discovery.win
       }
-      // that.win.maximize()
     })
   }
 }
