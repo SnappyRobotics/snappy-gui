@@ -191,7 +191,7 @@ var discovery = {
         })
     })
   },
-  ips: function(callback) {
+  ips: function() {
     return new Promise(function(resolve, reject, onCancel) {
       onCancel(function() {
         resolve([])
@@ -223,7 +223,7 @@ var discovery = {
       resolve(addresses)
     })
   },
-  getRange: function(callback) {
+  getRange: function() {
     return new Promise(function(resolve, reject, onCancel) {
       onCancel(function() {
         resolve([])
@@ -243,7 +243,7 @@ var discovery = {
       })
     })
   },
-  autoScan: function(callback) {
+  autoScan: function() {
     var retAr = []
     return new Promise(function(resolve, reject, onCancel) {
       discovery.getRange().then(function(range) {
@@ -274,7 +274,7 @@ var discovery = {
       })
     })
   },
-  ping: function(ip, callback) {
+  ping: function(ip) {
     return new Promise(function(resolve, reject, onCancel) {
       var rs = req({
         uri: "http://" + ip + ":" + global.snappy_gui.client_PORT + "/info",

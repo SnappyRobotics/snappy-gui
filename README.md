@@ -8,6 +8,9 @@ Dependency check : [![Dependency Status](https://david-dm.org/SnappyRobotics/sna
 Development dependency check :
 [![devDependencies Status](https://david-dm.org/SnappyRobotics/snappy-gui/dev-status.svg)](https://david-dm.org/SnappyRobotics/snappy-gui?type=dev)
 
+[![Known Vulnerabilities](https://snyk.io/test/github/snappyrobotics/snappy-gui/badge.svg)](https://snyk.io/test/github/snappyrobotics/snappy-gui)
+
+
 [![npm](https://img.shields.io/npm/dt/snappy-gui.svg)](https://snappyrobotics.github.io/)
 
 

@@ -1,16 +1,17 @@
 "use strict";
 
-var helpers = require('../global-setup')
-var path = require('path')
-var fs = require('fs')
+const helpers = require('../global-setup')
+const nock = require('nock')
+const path = require('path')
+const fs = require('fs')
 
-const debug = require('debug')("snappy:gui:test:discovery_spec")
+const debug = require('debug')("snappy:gui:test:gui:discovery_spec")
 // const core = require('snappy-core')
 
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
 
-  //process.env.CI = true
+  process.env.CI = true
 
   var app = null
 
@@ -27,7 +28,7 @@ describe('Snappy GUI', function() {
   afterEach(function() {
     return helpers.stopApplication(app)
   })
-
+  /*
   it('opens discovery window with no clients', function() {
     return app.client
       .getMainProcessLogs().then(debug)
@@ -44,7 +45,9 @@ describe('Snappy GUI', function() {
       .getTitle().should.eventually.be.equal("Discovery Wizard")
       .getText('#devices_count').should.eventually.equal('0')
   })
+  */
 
+  /*
   it('click locally button and then click cancel', function() {
     return app.client
       .getMainProcessLogs().then(debug)
@@ -64,5 +67,6 @@ describe('Snappy GUI', function() {
       .pause(1400)
       .click('#cancelConnectingBtn')
   })
+  */
 
 })

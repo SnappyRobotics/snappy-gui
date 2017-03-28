@@ -62,14 +62,23 @@ module.exports = function(grunt) {
       all: {
         src: ['test/**/*_spec.js']
       }
+    },
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['test/**/*.js']
+      }
     }
-  });
+  })
   //grunt.loadTasks('tasks')
 
   grunt.loadNpmTasks('grunt-contrib-jshint')
   grunt.loadNpmTasks('grunt-simple-mocha');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
 
   grunt.registerTask('default', ['test'])
-  grunt.registerTask('test', ['jshint', 'simplemocha'])
+  grunt.registerTask('test', ['jshint', 'mochaTest'])
 }
