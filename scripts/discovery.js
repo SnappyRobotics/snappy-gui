@@ -101,6 +101,15 @@ var discovery = {
         global.snappy_gui.core.start().then(function() {
           debug("local core started")
 
+          debug("Connecting to IP:", arg)
+
+          if (that.allPromises) {
+            that.allPromises.cancel()
+          }
+          if (that.forcedLocalPromise) {
+            that.forcedLocalPromise.cancel()
+          }
+
           global.snappy_gui.client_IP = '127.0.0.1'
           that.progress_connecting()
         })
@@ -112,9 +121,12 @@ var discovery = {
     debug("received connect_core ipc event")
 
     debug("Connecting to IP:", arg)
+
     if (that.allPromises) {
-      that.forcedLocalPromise.cancel()
       that.allPromises.cancel()
+    }
+    if (that.forcedLocalPromise) {
+      that.forcedLocalPromise.cancel()
     }
 
     global.snappy_gui.client_IP = arg
