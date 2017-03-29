@@ -37,6 +37,25 @@ describe('Discovery class functions', function() {
         done()
       })
   })
+  it('Test Ping function with non snappy response', function(done) {
+    nock('http://127.0.0.1:8000')
+      .get('/info')
+      .reply(200, {
+        name: "Snappy Robotics Software",
+        version: '1.0.2',
+        description: 'sdf .....',
+        snappy: false
+      })
+
+    const discovery = require(path.join(__dirname, '..', '..', 'scripts', 'discovery'))
+    discovery.ping('127.0.0.1')
+      .then(function(ip) {
+        expect(ip).to.be.an('object')
+        expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
+        expect(ip).to.have.property('found').that.is.a('boolean').which.is.false
+        done()
+      })
+  })
 
   it('Test getRange function', function(done) {
     discovery.getRange('127.0.0.1')
@@ -54,8 +73,8 @@ describe('Discovery class functions', function() {
       })
   })
 
-  it('Check ping for many existing nodes', function(done) {
-    //this.timeout(10000)
+  it('Check ping for 253 existing nodes', function(done) {
+    this.timeout(10000)
     nock(/192.168.108.([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]):8000/)
       .get('/info')
       .times(290)
@@ -81,7 +100,6 @@ describe('Discovery class functions', function() {
         var promise = discovery.ping(arr[i]);
         promise.then(function(ip) {
           if (ip.found) {
-            // debug("Found Device at :", ip.ip)
             retAr.push(ip.ip)
           }
         })
@@ -92,9 +110,41 @@ describe('Discovery class functions', function() {
       allPromises
         .then(function(ot) {
           debug("Scanning complete")
-          debug(retAr)
+          expect(retAr).to.be.an('array');
+          expect(retAr.length).to.be.equal(253)
           done()
         })
     })
+  })
+
+  it('Check isPortTaken function with port free', function(done) {
+    // this.timeout(10000)
+    discovery.isPortTaken(function(err, isIt) {
+      expect(isIt).to.be.a('boolean')
+      expect(isIt).to.be.false
+      done()
+    })
+  })
+
+  it('Check isPortTaken function with port already in use', function(done) {
+    // this.timeout(10000)
+    var net = require('net')
+    var tester = net.createServer()
+      .once('error', function(err) {
+        if (err.code != 'EADDRINUSE') {
+          done(err)
+          return
+        }
+        debug("Error! Port already in use :", global.snappy_gui.client_PORT)
+      })
+      .once('listening', function() {
+        // tester.close()
+        discovery.isPortTaken(function(err, isIt) {
+          expect(isIt).to.be.a('boolean')
+          expect(isIt).to.be.true
+          done()
+        })
+      })
+      .listen(global.snappy_gui.client_PORT)
   })
 })
