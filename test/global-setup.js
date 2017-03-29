@@ -36,14 +36,10 @@ exports.startApplication = function(options) {
   }
   options.quitTimeout = 1000
   options.requireName = 'electronRequire'
-  //debug("Options:", options)
 
   var app = new Application(options)
 
-  //debug("starting app")
-
   return app.start().then(function() {
-    //debug("started app")
     assert.equal(app.isRunning(), true)
     chaiAsPromised.transferPromiseness = app.transferPromiseness
     return app

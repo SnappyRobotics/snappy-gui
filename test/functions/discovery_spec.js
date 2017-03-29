@@ -1,5 +1,8 @@
 "use strict";
 
+process.env.WINDOW = undefined;
+delete process.env.WINDOW
+
 const nock = require('nock')
 const path = require('path')
 const fs = require('fs')

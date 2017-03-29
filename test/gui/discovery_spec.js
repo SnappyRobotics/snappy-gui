@@ -1,7 +1,8 @@
 "use strict";
 
+process.env.WINDOW = 'discovery'
+
 const helpers = require('../global-setup')
-const nock = require('nock')
 const path = require('path')
 const fs = require('fs')
 
@@ -11,11 +12,9 @@ const debug = require('debug')("snappy:gui:test:gui:discovery_spec")
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
 
-  process.env.CI = true
+  //  process.env.CI = true
 
   var app = null
-
-  global.window = 'discovery'
 
   beforeEach(function() {
     return helpers.startApplication({
