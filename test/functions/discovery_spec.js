@@ -163,15 +163,13 @@ describe('Discovery class functions', function() {
       this.timeout(10000)
       core.start()
 
-      setTimeout(function() {
-        discovery.ping('127.0.0.1')
-          .then(function(ip) {
-            expect(ip).to.be.an('object')
-            expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
-            expect(ip).to.have.property('found').that.is.a('boolean').which.is.false
-            done()
-          })
-      }, 3000);
+      discovery.ping('127.0.0.1')
+        .then(function(ip) {
+          expect(ip).to.be.an('object')
+          expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
+          expect(ip).to.have.property('found').that.is.a('boolean').which.is.false
+          done()
+        })
     })
   })
 })
