@@ -1,7 +1,8 @@
 "use strict";
 
-process.env.WINDOW = undefined;
 delete process.env.WINDOW
+
+require('../setup')
 
 const nock = require('nock')
 const path = require('path')

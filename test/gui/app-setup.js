@@ -14,7 +14,7 @@ global.before(function() {
 })
 
 exports.getElectronPath = function() {
-  var electronPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron')
+  var electronPath = path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron')
   if (process.platform === 'win32') {
     electronPath += '.cmd'
   }

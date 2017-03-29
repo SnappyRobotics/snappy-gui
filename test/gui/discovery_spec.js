@@ -2,7 +2,8 @@
 
 process.env.WINDOW = 'discovery'
 
-const helpers = require('../global-setup')
+require('../setup')
+const helpers = require('./app-setup')
 const path = require('path')
 const fs = require('fs')
 
@@ -11,8 +12,6 @@ const debug = require('debug')("snappy:gui:test:gui:discovery_spec")
 
 describe('Snappy GUI', function() {
   helpers.setupTimeout(this)
-
-  //  process.env.CI = true
 
   var app = null
 
