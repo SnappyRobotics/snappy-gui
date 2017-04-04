@@ -1,45 +1,89 @@
 "use strict";
 
-var helpers = require('../global-setup')
-var path = require('path')
-var fs = require('fs')
+process.env.WINDOW = 'discovery'
 
-const debug = require('debug')("snappy:gui:test:discovery_spec")
+require('../setup')
+const helpers = require('./app-setup')
+const path = require('path')
+const fs = require('fs')
+
+const req = require('req-fast')
+
+const debug = require('debug')("snappy:gui:test:gui:discovery_spec")
 // const core = require('snappy-core')
 
-describe('Snappy GUI', function() {
-  helpers.setupTimeout(this)
+describe('Discovery GUI', function() {
+  describe('without mock devices', function() {
+    helpers.setupTimeout(this)
+    var app = null
 
-  process.env.CI = true
+    beforeEach(function() {
+      delete process.env.GUI_TEST
 
-  var app = null
+      return helpers.startApplication({
+        args: [path.join(__dirname, '..', '..', 'main.js')]
+      }).then(function(startedApp) {
+        app = startedApp
+      })
+    })
 
-  beforeEach(function() {
-    return helpers.startApplication({
-      args: [path.join(__dirname, '..', '..', 'main.js')]
-    }).then(function(startedApp) {
-      app = startedApp
+    afterEach(function() {
+      return helpers.stopApplication(app)
+    })
+
+    it('opens discovery window with no clients', function() {
+      return app.client
+        .getMainProcessLogs().then(debug)
+        .getRenderProcessLogs().then(debug)
+        .waitUntilWindowLoaded()
+        .getWindowCount().should.eventually.equal(1)
+        .browserWindow.focus()
+        .browserWindow.isMinimized().should.eventually.be.false
+        .browserWindow.isDevToolsOpened().should.eventually.be.false
+        .browserWindow.isVisible().should.eventually.be.true
+        .browserWindow.isFocused().should.eventually.be.true
+        .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
+        .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
+        .getTitle().should.eventually.be.equal("Discovery Wizard")
+        .getText('#devices_count').should.eventually.equal('0')
+    })
+
+    it('click locally button and then click cancel', function() {
+      return app.client
+        .getMainProcessLogs().then(debug)
+        .getRenderProcessLogs().then(debug)
+        .waitUntilWindowLoaded()
+        .getText('#devices_count').should.eventually.equal('0')
+        .pause(1000)
+        .click("#localBtn")
+        .pause(1700)
+        .click('#cancelConnectingBtn')
     })
   })
+  describe('with mock devices', function() {
+    helpers.setupTimeout(this)
 
-  afterEach(function() {
-    return helpers.stopApplication(app)
-  })
+    var app = null
 
-  it('opens discovery window with no clients', function() {
-    return app.client
-      .getMainProcessLogs().then(debug)
-      .getRenderProcessLogs().then(debug)
-      .waitUntilWindowLoaded()
-      .getWindowCount().should.eventually.equal(1)
-      .browserWindow.focus()
-      .browserWindow.isMinimized().should.eventually.be.false
-      .browserWindow.isDevToolsOpened().should.eventually.be.false
-      .browserWindow.isVisible().should.eventually.be.true
-      .browserWindow.isFocused().should.eventually.be.true
-      .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
-      .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
-      .getTitle().should.eventually.be.equal("Discovery Wizard")
-      .getText('#devices_count').should.eventually.equal('0')
+    beforeEach(function() {
+      process.env.GUI_TEST = 'NOCKS'
+      return helpers.startApplication({
+        args: [path.join(__dirname, '..', '..', 'main.js')]
+      }).then(function(startedApp) {
+        app = startedApp
+      })
+    })
+
+    afterEach(function() {
+      return helpers.stopApplication(app)
+    })
+
+    it('scan with 253 fake servers', function() {
+      return app.client
+        .getMainProcessLogs().then(debug)
+        // .getRenderProcessLogs().then(debug)
+        .waitUntilWindowLoaded()
+        .waitUntilTextExists('#devices_count', '253')
+    })
   })
 })

@@ -167,7 +167,7 @@ var discovery = {
       var retAr = []
       range.unshift("127.0.0.1") //------------ adding localhost to first
       for (var i = 0; i < range.length; i++) {
-        var promise = discovery.ping(range[i]);
+        var promise = that.ping(range[i]);
         promise.then(function(ip) {
           event.sender.send("discovery:searching", ip.ip)
           if (ip.found) {
@@ -185,13 +185,13 @@ var discovery = {
           debug("Scanning complete")
           event.sender.send("discovery:scan_done", retAr)
         })
-        .finally(function() {
-          debug("Scanning completed finally")
+        .catch(function() {
+          debug("Scanning completed with some error")
           event.sender.send("discovery:scan_done", [])
         })
     })
   },
-  ips: function(callback) {
+  ips: function() {
     return new Promise(function(resolve, reject, onCancel) {
       onCancel(function() {
         resolve([])
@@ -219,11 +219,18 @@ var discovery = {
           addresses[i].netmask = "255.255.255.255";
         }
       }
+      if (process.env.NODE_ENV === 'test') { // Add IP series for testing
+        addresses.push({
+          address: '192.168.108.1',
+          netmask: '255.255.255.0'
+        })
+      }
+
       debug("Network Interfaces :", addresses)
       resolve(addresses)
     })
   },
-  getRange: function(callback) {
+  getRange: function() {
     return new Promise(function(resolve, reject, onCancel) {
       onCancel(function() {
         resolve([])
@@ -243,7 +250,7 @@ var discovery = {
       })
     })
   },
-  autoScan: function(callback) {
+  autoScan: function() {
     var retAr = []
     return new Promise(function(resolve, reject, onCancel) {
       discovery.getRange().then(function(range) {
@@ -274,7 +281,7 @@ var discovery = {
       })
     })
   },
-  ping: function(ip, callback) {
+  ping: function(ip) {
     return new Promise(function(resolve, reject, onCancel) {
       var rs = req({
         uri: "http://" + ip + ":" + global.snappy_gui.client_PORT + "/info",

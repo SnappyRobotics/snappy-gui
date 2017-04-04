@@ -1,5 +1,7 @@
 "use strict";
 
+process.env.TEST_MODE = 'GUI'
+
 var Application = require('spectron').Application
 var assert = require('assert')
 var chai = require('chai')
@@ -14,7 +16,7 @@ global.before(function() {
 })
 
 exports.getElectronPath = function() {
-  var electronPath = path.join(__dirname, '..', 'node_modules', '.bin', 'electron')
+  var electronPath = path.join(__dirname, '..', '..', 'node_modules', '.bin', 'electron')
   if (process.platform === 'win32') {
     electronPath += '.cmd'
   }
@@ -36,14 +38,10 @@ exports.startApplication = function(options) {
   }
   options.quitTimeout = 1000
   options.requireName = 'electronRequire'
-  //debug("Options:", options)
 
   var app = new Application(options)
 
-  //debug("starting app")
-
   return app.start().then(function() {
-    //debug("started app")
     assert.equal(app.isRunning(), true)
     chaiAsPromised.transferPromiseness = app.transferPromiseness
     return app
