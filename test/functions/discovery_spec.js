@@ -1,8 +1,7 @@
 "use strict";
 
-delete process.env.WINDOW
-
 require('../setup')
+require('./app-setup')
 
 const nock = require('nock')
 const path = require('path')
@@ -80,7 +79,7 @@ describe('Discovery class functions', function() {
       this.timeout(10000)
       nock(/192.168.108.([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]):8000/)
         .get('/info')
-        .times(290)
+        .times(253)
         .reply(200, {
           name: "Snappy Robotics Software",
           version: '1.0.2',

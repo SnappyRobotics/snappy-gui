@@ -29,7 +29,7 @@
 		</div>
 
 		<div ng-hide="connecting" style="padding:30px;">
-			<span class="hidden" id="status_txt">{{status}}</span>
+			<span class="" id="status_txt">{{status}}</span>
 
 			<h1> Device auto discovery wizard</h1>
 			<br>
@@ -103,36 +103,41 @@
 						$scope.status = "searching..";
 						$scope.scanning = true;
 						$scope.devices = [];
-
-						ipc.on("discovery:devices", function(em, devices) {
-							debug("Got :" + devices);
-
-							$scope.$apply(function() {
-								$scope.devices = devices;
-							})
-						})
-						ipc.on("discovery:searching", function(em, ip) {
-							debug("Searching for :" + ip);
-
-							$scope.$apply(function() {
-								$scope.searching = ip;
-							})
-						})
-						ipc.on("discovery:scan_done", function(em, devices) {
-							if (Array.isArray(devices)) {
-								$scope.$apply(function() {
-									$scope.status = "Scan complete";
-									$scope.scanning = false;
-									$scope.devices = devices;
-								})
-							} else {
-								$scope.$apply(function() {
-									$scope.status = "Scan complete";
-									$scope.devices = []
-								});
-							}
-						})
 					}
+
+					ipc.on("discovery:devices", function(em, devices) {
+						debug("Got :" + devices);
+
+						$scope.$apply(function() {
+							$scope.devices = devices;
+						})
+					})
+					ipc.on("discovery:searching", function(em, ip) {
+						debug("Searching for :" + ip);
+
+						$scope.$apply(function() {
+							$scope.searching = ip;
+						})
+					})
+					ipc.on("discovery:scan_done", function(em, devices) {
+						var isArr = Object.prototype.toString.call(devices) == '[object Array]';
+						if (isArr) {
+							$scope.$apply(function() {
+								$scope.status = "Scan complete";
+								$scope.scanning = false;
+								if (typeof devices === 'string' || devices instanceof String) {
+									$scope.devices = devices.split(',')
+								} else {
+									$scope.devices = devices;
+								}
+							})
+						} else {
+							$scope.$apply(function() {
+								$scope.status = "Scan complete";
+								$scope.devices = []
+							});
+						}
+					})
 
 					$scope.start_scanning()
 				}]);

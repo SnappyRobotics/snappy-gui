@@ -31,11 +31,16 @@ global.snappy_gui.mainWindow = require(path.join(__dirname, 'scripts', 'mainWind
 //=============================================================================
 
 
-if (process.env.NODE_ENV != 'test') {
-  global.snappy_gui.window = ['discovery', 'mainWindow'][0]
-}
 if (process.env.WINDOW) {
   global.snappy_gui.window = process.env.WINDOW
+}
+
+if (process.env.NODE_ENV != 'test') {
+  global.snappy_gui.window = ['discovery', 'mainWindow'][0]
+} else {
+  if (process.env.TEST_MODE && process.env.TEST_MODE == 'GUI') {
+    require(path.join(__dirname, 'test', 'gui', global.snappy_gui.window + '_nocks.js'));
+  }
 }
 
 if (global.snappy_gui.window) {

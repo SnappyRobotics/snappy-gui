@@ -1,5 +1,7 @@
 "use strict";
 
+process.env.TEST_MODE = 'GUI'
+
 var Application = require('spectron').Application
 var assert = require('assert')
 var chai = require('chai')

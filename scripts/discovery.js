@@ -167,7 +167,7 @@ var discovery = {
       var retAr = []
       range.unshift("127.0.0.1") //------------ adding localhost to first
       for (var i = 0; i < range.length; i++) {
-        var promise = discovery.ping(range[i]);
+        var promise = that.ping(range[i]);
         promise.then(function(ip) {
           event.sender.send("discovery:searching", ip.ip)
           if (ip.found) {
@@ -185,8 +185,8 @@ var discovery = {
           debug("Scanning complete")
           event.sender.send("discovery:scan_done", retAr)
         })
-        .finally(function() {
-          debug("Scanning completed finally")
+        .catch(function() {
+          debug("Scanning completed with some error")
           event.sender.send("discovery:scan_done", [])
         })
     })
