@@ -33,8 +33,7 @@ module.exports = function(grunt) {
           src: [
             'main.js',
             'Gruntfile.js',
-            'scripts/**/*.js',
-            'main_process/**/*.js'
+            'scripts/**/*.js'
           ]
         }
       },
@@ -58,31 +57,48 @@ module.exports = function(grunt) {
         }
       }
     },
+    clean: {
+      coverage: {
+        src: ['coverage/**/*.js']
+      }
+    },
+    copy: {
+      coverage: {
+        src: ['test/**', 'scripts/**', 'main.js', 'package.json'],
+        dest: 'coverage/'
+      }
+    },
+    blanket: {
+      src: ['coverage/scripts/**/*.js']
+    },
     mochaTest: {
       functions: {
         options: {
-          reporter: 'spec',
           //  captureFile: 'results.txt', // Optionally capture the reporter output to a file
-          require: 'babel-register'
-        },
-        src: ['test/functions/*_spec.js']
-      },
-      gui: {
-        options: {
+          require: 'babel-register',
           reporter: 'spec'
         },
+        src: ['coverage/test/functions/*_spec.js']
+      },
+      gui: {
         src: ['test/gui/*_spec.js']
       }
     }
   })
 
   grunt.loadNpmTasks('grunt-contrib-jshint')
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mocha-test')
+  grunt.loadNpmTasks('grunt-blanket');
 
 
   grunt.registerTask('default', ['test'])
   grunt.registerTask('test', [
     'jshint',
+    'clean',
+    'blanket',
+    'copy',
     'mochaTest:gui',
     'mochaTest:functions'
   ])
