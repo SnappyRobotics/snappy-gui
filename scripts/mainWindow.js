@@ -69,11 +69,42 @@ var mainWindow = {
       .defaultSession
       .webRequest
       .onBeforeSendHeaders(function(details, callback) {
-        details.requestHeaders['x-access-token'] = global.snappy_gui.config.token
+        details.requestHeaders['x-access-token'] = global.snappy_gui.config.token + '1'
         callback({
           cancel: false,
           requestHeaders: details.requestHeaders
         })
+      })
+
+    session
+      .defaultSession
+      .webRequest
+      .onCompleted(function(details) {
+        if (details.statusCode != 200) {
+          debug("WebRequest session : ", details)
+          if (details.statusCode == 403) {
+            dialog.showMessageBox(that.win, {
+              "type": "error",
+              "buttons": [
+                "OK"
+              ],
+              "defaultId": 0,
+              "title": "Authentication failed",
+              "message": "Error! not logged in"
+            })
+            if (global.snappy_gui.discovery.win == null) {
+              global.snappy_gui.discovery.createWindow()
+            }
+            that.win.destroy()
+          }
+        }
+      })
+
+    session
+      .defaultSession
+      .webRequest
+      .onErrorOccurred(function(details) {
+        debug("Error occurred in web request session", details)
       })
 
     debug('Loading : ', u)

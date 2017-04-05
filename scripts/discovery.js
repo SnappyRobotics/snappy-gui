@@ -210,7 +210,6 @@ var discovery = {
             debug(response.body)
           }
         });
-      // global.snappy_gui.mainWindow.createWindow()
     })
   },
   start_scanning: function(event, arg) {
