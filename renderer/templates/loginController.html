@@ -5,10 +5,10 @@
 			margin: 0!important;
 		}
 	</style>
-	<form name="loginForm" ng-submit="login()">
+	<form name="loginForm" ng-submit="login(loginForm)">
 		<md-input-container>
 			<label>Username</label>
-			<input ng-model="user.user" name='user' required>
+			<input ng-model="user.user" name='user' required md-autofocus>
 			<div ng-messages="loginForm.user.$error" ng-if='loginForm.user.$dirty'>
 				<div ng-message="required">Username is required!</div>
 			</div>
@@ -21,8 +21,11 @@
 			</div>
 		</md-input-container>
 		<div layout="row">
-			<md-button type='submit' class="md-raised md-primary" flex="50" flex-sm="100">Login</md-button>
-			<md-button class="md-raised md-warn" flex="50" ng-click='close_login()' flex-sm="100">cancel</md-button>
+			<md-button type='submit' class="md-raised md-primary" flex="50">Login</md-button>
+			<md-button class="md-raised md-warn" flex="50" ng-click='close_login()'>cancel</md-button>
+		</div>
+		<div md-colors="{color:'warn'}" ng-if='login_error'>
+			{{login_error}}
 		</div>
 	</form>
 </md-content>

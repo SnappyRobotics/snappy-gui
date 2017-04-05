@@ -9,6 +9,7 @@ const {
 
 
 const Promise = require('bluebird')
+const unirest = require('unirest')
 const req = require('req-fast')
 const path = require('path')
 const url = require('url')
@@ -74,7 +75,7 @@ var discovery = {
   start_core: function(event, arg) {
     var that = discovery
 
-    that.loginForm()
+    that.progress_connecting()
     setTimeout(function() {
 
       that.isPortTaken(function(err, ans) {
@@ -122,7 +123,7 @@ var discovery = {
     var that = discovery
     debug("received connect_core ipc event")
 
-    that.loginForm()
+    that.progress_connecting()
 
     debug("Connecting to IP:", arg)
 
@@ -158,8 +159,8 @@ var discovery = {
     })
 
     setTimeout(function() {
-      global.snappy_gui.mainWindow.createWindow()
-    }, 2000);
+      that.loginForm()
+    }, 3000);
   },
   loginForm: function() {
     var that = discovery
@@ -178,12 +179,32 @@ var discovery = {
     that.win.setMenuBarVisibility(false)
     that.win.setTitle("Login")
 
+    that.win.webContents.send('login:loaded')
+
+    that.win.webContents.on('did-finish-load', function() {
+      debug("loaded win with discovery:loginForm")
+    })
+
     ipcMain.on('discovery:cancel_login', function(event, arg) {
       that.quit()
     })
 
     ipcMain.on('discovery:login', function(event, arg) {
-      debug("login..", arg)
+      unirest.post("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/login")
+        .headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        })
+        .send(arg)
+        .end(function(response) {
+          if (response.error) {
+            event.sender.send("login:error", response.body)
+            return
+          } else {
+            debug(response.body)
+          }
+        });
+      // global.snappy_gui.mainWindow.createWindow()
     })
   },
   start_scanning: function(event, arg) {
