@@ -5,6 +5,7 @@ const {
   app,
   dialog,
   ipcMain,
+  session,
   BrowserWindow
 } = require('electron')
 
@@ -62,8 +63,22 @@ var mainWindow = {
       slashes: true
     })
 
+    debug("Applying token :", global.snappy_gui.config.token)
+
+    session
+      .defaultSession
+      .webRequest
+      .onBeforeSendHeaders(function(details, callback) {
+        details.requestHeaders['x-access-token'] = global.snappy_gui.config.token
+        callback({
+          cancel: false,
+          requestHeaders: details.requestHeaders
+        })
+      })
+
     debug('Loading : ', u)
     that.win.loadURL(u)
+
 
     that.win.on('close', function(e) {
       debug("Closing... mainWindow")

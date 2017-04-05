@@ -203,7 +203,8 @@ var discovery = {
           } else {
             event.sender.send("login:success")
             if (response.body.success) {
-              // global.snappy_gui.config
+              global.snappy_gui.config.token = response.body.token
+              global.snappy_gui.saveConfig()
               global.snappy_gui.mainWindow.createWindow()
             }
             debug(response.body)

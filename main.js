@@ -26,10 +26,13 @@ try {
 
   global.snappy_gui.config = ob
 
-  fs.writeFileSync(path.join(__dirname, '..', 'userDir', "config.json"), JSON.stringify(ob))
+  fs.writeFileSync(path.join(__dirname, "data", "config.json"), JSON.stringify(ob))
+}
+global.snappy_gui.saveConfig = function() {
+  fs.writeFileSync(path.join(__dirname, "data", "config.json"), JSON.stringify(global.snappy_gui.config))
 }
 
-global.snappy_gui.package = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "package.json")))
+global.snappy_gui.package = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json")))
 debug("=======================================================================")
 debug("\t\t\t\t\t" + global.snappy_gui.package.name)
 debug("\t\t\t\t    " + global.snappy_gui.package.description)
