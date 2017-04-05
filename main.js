@@ -16,7 +16,20 @@ global.snappy_gui = {}
 global.snappy_gui.client_PORT = 8000
 //------------------------------------------------------------------------
 
-global.snappy_gui.package = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json")))
+
+try {
+  global.snappy_gui.config = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "config.json")))
+
+} catch (e) {
+  console.error("No Config File exists in userDir");
+  var ob = {}
+
+  global.snappy_gui.config = ob
+
+  fs.writeFileSync(path.join(__dirname, '..', 'userDir', "config.json"), JSON.stringify(ob))
+}
+
+global.snappy_gui.package = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "package.json")))
 debug("=======================================================================")
 debug("\t\t\t\t\t" + global.snappy_gui.package.name)
 debug("\t\t\t\t    " + global.snappy_gui.package.description)

@@ -202,7 +202,10 @@ var discovery = {
             return
           } else {
             event.sender.send("login:success")
-
+            if (response.body.success) {
+              // global.snappy_gui.config
+              global.snappy_gui.mainWindow.createWindow()
+            }
             debug(response.body)
           }
         });

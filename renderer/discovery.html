@@ -165,7 +165,6 @@
 
 					$scope.login = function(form) {
 						progress(true)
-						$scope.show_progress = true
 
 						ipc.send('discovery:login', $scope.user);
 						// window.location.href = '#!/connecting'
