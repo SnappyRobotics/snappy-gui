@@ -69,7 +69,7 @@ var mainWindow = {
       .defaultSession
       .webRequest
       .onBeforeSendHeaders(function(details, callback) {
-        details.requestHeaders['x-access-token'] = global.snappy_gui.config.token + '1'
+        details.requestHeaders['x-access-token'] = global.snappy_gui.config.token
         callback({
           cancel: false,
           requestHeaders: details.requestHeaders
