@@ -178,8 +178,12 @@ var discovery = {
     that.win.setMenuBarVisibility(false)
     that.win.setTitle("Login")
 
-    ipcMain.on('login:login', function(event, arg) {
+    ipcMain.on('discovery:cancel_login', function(event, arg) {
+      that.quit()
+    })
 
+    ipcMain.on('discovery:login', function(event, arg) {
+      debug("login..", arg)
     })
   },
   start_scanning: function(event, arg) {

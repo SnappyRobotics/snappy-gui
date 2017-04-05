@@ -19,13 +19,14 @@
 	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-material/angular-material.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-route/angular-route.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-messages/angular-messages.js"></script>
 
 	<body ng-app="app">
 		<ng-view>
 		</ng-view>
 		<script type="text/javascript">
 			angular
-				.module('app', ['ngMaterial', 'ngAnimate', 'ngRoute'])
+				.module('app', ['ngMaterial', 'ngAnimate', 'ngRoute', 'ngMessages'])
 				.config(['$mdThemingProvider', '$routeProvider', '$locationProvider', function($mdThemingProvider, $routeProvider, $locationProvider) {
 					$mdThemingProvider
 						.theme('docs-dark', 'default')
@@ -128,6 +129,15 @@
 				.controller('loginController', ['$scope', function($scope) {
 					debug("loginController started");
 					$scope.device = window.device
+					$scope.user = {}
+					$scope.close_login = function() {
+						ipc.send('discovery:cancel_login');
+					}
+
+					$scope.login = function() {
+						ipc.send('discovery:login', $scope.user);
+					}
+
 				}])
 		</script>
 	</body>

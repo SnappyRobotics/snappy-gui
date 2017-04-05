@@ -5,16 +5,24 @@
 			margin: 0!important;
 		}
 	</style>
-	<md-input-container>
-		<label>Username</label>
-		<input ng-model="user.user">
-	</md-input-container>
-	<md-input-container>
-		<label>Password</label>
-		<input ng-model="user.pass" type="password">
-	</md-input-container>
-	<div layout="row">
-		<md-button class="md-raised md-primary" flex="50" flex-sm="100">Login</md-button>
-		<md-button class="md-raised md-warn" flex="50" flex-sm="100">cancel</md-button>
-	</div>
+	<form name="loginForm" ng-submit="login()">
+		<md-input-container>
+			<label>Username</label>
+			<input ng-model="user.user" name='user' required>
+			<div ng-messages="loginForm.user.$error" ng-if='loginForm.user.$dirty'>
+				<div ng-message="required">Username is required!</div>
+			</div>
+		</md-input-container>
+		<md-input-container>
+			<label>Password</label>
+			<input ng-model="user.pass" name='pass' required type="password">
+			<div ng-messages="loginForm.pass.$error" ng-if='loginForm.pass.$dirty'>
+				<div ng-message="required">Password is required!</div>
+			</div>
+		</md-input-container>
+		<div layout="row">
+			<md-button type='submit' class="md-raised md-primary" flex="50" flex-sm="100">Login</md-button>
+			<md-button class="md-raised md-warn" flex="50" ng-click='close_login()' flex-sm="100">cancel</md-button>
+		</div>
+	</form>
 </md-content>
