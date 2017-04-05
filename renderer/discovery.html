@@ -42,7 +42,17 @@
 				} else {
 					document.getElementById('progress').style.display = 'none'
 				}
+
+				var els = document.getElementsByClassName('ctrlView')
+				for (var i = 0; i < els.length; i++) {
+					if (show) {
+						els[i].style.display = 'none'
+					} else {
+						els[i].style.display = 'block'
+					}
+				}
 			}
+
 			angular
 				.module('app', ['ngMaterial', 'ngAnimate', 'ngRoute', 'ngMessages'])
 				.config(['$mdThemingProvider', '$routeProvider', '$locationProvider', function($mdThemingProvider, $routeProvider, $locationProvider) {
@@ -69,7 +79,6 @@
 				}])
 				.controller('discoveryController', ['$scope', function($scope) {
 					progress(false)
-					$scope.show_progress = false
 
 					debug("discoveryController started");
 
@@ -79,7 +88,6 @@
 							ipc.send('discovery:start_core');
 						}, 100);
 						progress(true)
-						$scope.show_progress = true
 					}
 
 					$scope.connect = function(ip) {
@@ -88,7 +96,6 @@
 							ipc.send('discovery:connect_core', ip);
 						}, 100);
 						progress(true)
-						$scope.show_progress = true
 					}
 
 					$scope.start_scanning = function() {
@@ -148,7 +155,6 @@
 				}])
 				.controller('loginController', ['$scope', function($scope) {
 					progress(false)
-					$scope.show_progress = false
 
 					debug("loginController started");
 					$scope.device = window.device
@@ -158,11 +164,15 @@
 					}
 
 					$scope.login = function(form) {
+						progress(true)
+						$scope.show_progress = true
+
 						ipc.send('discovery:login', $scope.user);
 						// window.location.href = '#!/connecting'
 
 
 						ipc.on("login:error", function(em, msg) {
+							progress(false)
 
 							// window.location.href = '#!/login'
 							if (msg.indexOf('user') > -1) {
@@ -182,6 +192,10 @@
 							setTimeout(function() {
 								delete $scope.login_error
 							}, 2000);
+						})
+
+						ipc.on("login:success", function(em, msg) {
+							progress(false)
 						})
 					}
 				}])

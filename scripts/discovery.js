@@ -201,6 +201,8 @@ var discovery = {
             event.sender.send("login:error", response.body)
             return
           } else {
+            event.sender.send("login:success")
+
             debug(response.body)
           }
         });
