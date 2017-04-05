@@ -18,85 +18,58 @@
 	<script type="text/javascript" src="../bower_components/angular-aria/angular-aria.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.js"></script>
 	<script type="text/javascript" src="../bower_components/angular-material/angular-material.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-route/angular-route.js"></script>
 
-	<body ng-app="app" ng-controller="discoveryController" ng-cloak>
-		<div ng-show="connecting" layout="column" layout-align="center center">
-			<br>
-			<md-progress-circular md-mode="indeterminate"></md-progress-circular>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connecting ....
-			<br>
-			<md-button id="cancelConnectingBtn" ng-click="cancelLoading()">Cancel connecting</md-button>
-		</div>
-
-		<div ng-hide="connecting" style="padding:30px;">
-			<span class="" id="status_txt">{{status}}</span>
-
-			<h1> Device auto discovery wizard</h1>
-			<br>
-			<div ng-if="scanning">
-				<md-progress-linear md-mode="indeterminate"></md-progress-linear>
-				<b id="status">{{status}}</b> :{{searching}}
-			</div>
-			<div ng-if="scanning === false">
-				<md-button id="rescanBtn" class="md-raised md-primary" ng-click="start_scanning()">
-					Rescan local network
-					<md-tooltip md-delay="500">
-						Restart the scanning accross all the networks this system is connected to
-					</md-tooltip>
-				</md-button>
-
-			</div>
-			<md-button id="localBtn" class="md-raised md-primary" ng-click="start_core()">
-				Start core locally
-				<md-tooltip md-delay="500">
-					Start the backend core to run program from this system
-				</md-tooltip>
-			</md-button>
-
-			<md-list flex>
-				<md-subheader class="md-no-sticky">Devices found (
-					<span id="devices_count">{{devices.length}}</span>):</md-subheader>
-				<md-list-item ng-repeat="ip in devices" layout="row">
-					<h3>{{ip}}</h3>
-					<span flex></span>
-					<md-button class="connectBtn md-raised" ng-click="connect(ip)">
-						Connect
-					</md-button>
-				</md-list-item>
-			</md-list>
-		</div>
-
+	<body ng-app="app">
+		<ng-view>
+		</ng-view>
 		<script type="text/javascript">
 			angular
-				.module('app', ['ngMaterial', 'ngAnimate'])
-				.config(['$mdThemingProvider', function($mdThemingProvider) {
+				.module('app', ['ngMaterial', 'ngAnimate', 'ngRoute'])
+				.config(['$mdThemingProvider', '$routeProvider', '$locationProvider', function($mdThemingProvider, $routeProvider, $locationProvider) {
 					$mdThemingProvider
 						.theme('docs-dark', 'default')
 						.primaryPalette('yellow')
 						.dark()
-						.foregroundPalette['3'] = 'yellow';
+						.foregroundPalette['3'] = 'yellow'
+
+					$routeProvider
+						.when('/', {
+							templateUrl: "templates/discoveryController.html",
+							controller: 'discoveryController',
+						})
+						.when('/connecting', {
+							templateUrl: "templates/connectingController.html",
+							controller: 'connectingController',
+						})
+						.otherwise({
+							templateUrl: "templates/discoveryController.html",
+							controller: 'discoveryController',
+						})
 				}])
-				.controller('discoveryController', ['$scope', function($scope) {
-					debug("Controller started");
-
-					$scope.start_core = function() {
-						$scope.connecting = true
-						ipc.send('discovery:start_core');
-					}
-
-					$scope.connect = function(ip) {
-						$scope.connecting = true
-						ipc.send('discovery:connect_core', ip);
-					}
+				.controller('connectingController', ['$scope', function($scope) {
+					debug("connectingController started");
 
 					$scope.cancelLoading = function() {
 						ipc.send('discovery:cancel_loading_core');
 					}
 
-
 					ipc.on("discovery:cancel_start_core", function(em, devices) {
-						$scope.connecting = false
+						window.location.href = '#!/'
 					})
+				}])
+				.controller('discoveryController', ['$scope', function($scope) {
+					debug("discoveryController started");
+
+					$scope.start_core = function() {
+						ipc.send('discovery:start_core');
+						window.location.href = '#!/connecting'
+					}
+
+					$scope.connect = function(ip) {
+						ipc.send('discovery:connect_core', ip);
+						window.location.href = '#!/connecting'
+					}
 
 					$scope.start_scanning = function() {
 						ipc.send('discovery:start_scanning');
