@@ -74,7 +74,7 @@ var discovery = {
   start_core: function(event, arg) {
     var that = discovery
 
-    that.progress_connecting()
+    that.loginForm()
     setTimeout(function() {
 
       that.isPortTaken(function(err, ans) {
@@ -122,7 +122,7 @@ var discovery = {
     var that = discovery
     debug("received connect_core ipc event")
 
-    that.progress_connecting()
+    that.loginForm()
 
     debug("Connecting to IP:", arg)
 
@@ -160,6 +160,27 @@ var discovery = {
     setTimeout(function() {
       global.snappy_gui.mainWindow.createWindow()
     }, 2000);
+  },
+  loginForm: function() {
+    var that = discovery
+
+    debug("showing loginForm")
+    that.win.setContentSize(240, 300)
+    that.win.setResizable(false)
+    that.win.setMovable(true)
+    that.win.setMaximizable(false)
+    that.win.setMinimizable(true)
+    that.win.setFullScreenable(false)
+    that.win.setClosable(true)
+    that.win.setAlwaysOnTop(false)
+    that.win.center()
+    that.win.setProgressBar(0)
+    that.win.setMenuBarVisibility(false)
+    that.win.setTitle("Login")
+
+    ipcMain.on('login:login', function(event, arg) {
+
+    })
   },
   start_scanning: function(event, arg) {
     var that = discovery

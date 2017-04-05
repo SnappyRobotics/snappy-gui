@@ -36,43 +36,39 @@
 					$routeProvider
 						.when('/', {
 							templateUrl: "templates/discoveryController.html",
-							controller: 'discoveryController',
+							controller: 'discoveryController'
 						})
 						.when('/connecting', {
 							templateUrl: "templates/connectingController.html",
-							controller: 'connectingController',
+							controller: 'connectingController'
 						})
-						.otherwise({
-							templateUrl: "templates/discoveryController.html",
-							controller: 'discoveryController',
+						.when('/login', {
+							templateUrl: "templates/loginController.html",
+							controller: 'loginController'
 						})
-				}])
-				.controller('connectingController', ['$scope', function($scope) {
-					debug("connectingController started");
 
-					$scope.cancelLoading = function() {
-						ipc.send('discovery:cancel_loading_core');
-					}
-
-					ipc.on("discovery:cancel_start_core", function(em, devices) {
-						window.location.href = '#!/'
-					})
+					// .otherwise({
+					// 	templateUrl: "templates/loginController.html",
+					// 	controller: 'loginController',
+					// })
 				}])
 				.controller('discoveryController', ['$scope', function($scope) {
 					debug("discoveryController started");
 
 					$scope.start_core = function() {
+						window.device = '127.0.0.1'
 						setTimeout(function() {
 							ipc.send('discovery:start_core');
 						}, 100);
-						window.location.href = '#!/connecting'
+						window.location.href = '#!/login'
 					}
 
 					$scope.connect = function(ip) {
+						window.device = ip
 						setTimeout(function() {
 							ipc.send('discovery:connect_core', ip);
 						}, 100);
-						window.location.href = '#!/connecting'
+						window.location.href = '#!/login'
 					}
 
 					$scope.start_scanning = function() {
@@ -117,7 +113,22 @@
 					})
 
 					$scope.start_scanning()
-				}]);
+				}])
+				.controller('connectingController', ['$scope', function($scope) {
+					debug("connectingController started");
+
+					$scope.cancelLoading = function() {
+						ipc.send('discovery:cancel_loading_core');
+					}
+
+					ipc.on("discovery:cancel_start_core", function(em, devices) {
+						window.location.href = '#!/'
+					})
+				}])
+				.controller('loginController', ['$scope', function($scope) {
+					debug("loginController started");
+					$scope.device = window.device
+				}])
 		</script>
 	</body>
 

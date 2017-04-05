@@ -1,0 +1,20 @@
+<md-content ng-cloak layout-padding>
+	<h3>Log-in into {{device}}</h3>
+	<style media="screen">
+		md-input-container {
+			margin: 0!important;
+		}
+	</style>
+	<md-input-container>
+		<label>Username</label>
+		<input ng-model="user.user">
+	</md-input-container>
+	<md-input-container>
+		<label>Password</label>
+		<input ng-model="user.pass" type="password">
+	</md-input-container>
+	<div layout="row">
+		<md-button class="md-raised md-primary" flex="50" flex-sm="100">Login</md-button>
+		<md-button class="md-raised md-warn" flex="50" flex-sm="100">cancel</md-button>
+	</div>
+</md-content>
