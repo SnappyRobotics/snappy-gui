@@ -73,64 +73,68 @@ var discovery = {
   },
   start_core: function(event, arg) {
     var that = discovery
-    require(path.join(__dirname, 'discovery.js'))
-    that.isPortTaken(function(err, ans) {
-      if (ans) {
-        event.sender.send("discovery:cancel_start_core")
 
-        that.forcedLocalPromise = discovery.ping('127.0.0.1'); // force check localhost
-        that.forcedLocalPromise.then(function(ip) {
-          event.sender.send("discovery:searching", ip.ip)
-          if (ip.found) {
-            debug("Found Device at :", ip.ip)
-            event.sender.send("discovery:devices", [ip.ip])
-          }
-        })
+    that.progress_connecting()
+    setTimeout(function() {
 
-        dialog.showMessageBox(that.win, {
-          "type": "error",
-          "buttons": [
-            "OK"
-          ],
-          "defaultId": 0,
-          "title": "uncaughtException Error",
-          "message": "Error! Port already in use :" + global.snappy_gui.client_PORT
-        })
-      } else {
-        global.snappy_gui.core = require('snappy-core')
-        global.snappy_gui.core.start().then(function() {
-          debug("local core started")
+      that.isPortTaken(function(err, ans) {
+        if (ans) {
+          event.sender.send("discovery:cancel_start_core")
 
-          debug("Connecting to IP:", arg)
+          that.forcedLocalPromise = discovery.ping('127.0.0.1'); // force check localhost
+          that.forcedLocalPromise.then(function(ip) {
+            event.sender.send("discovery:searching", ip.ip)
+            if (ip.found) {
+              debug("Found Device at :", ip.ip)
+              event.sender.send("discovery:devices", [ip.ip])
+            }
+          })
 
-          if (that.allPromises) {
-            that.allPromises.cancel()
-          }
-          if (that.forcedLocalPromise) {
-            that.forcedLocalPromise.cancel()
-          }
+          dialog.showMessageBox(that.win, {
+            "type": "error",
+            "buttons": [
+              "OK"
+            ],
+            "defaultId": 0,
+            "title": "uncaughtException Error",
+            "message": "Error! Port already in use :" + global.snappy_gui.client_PORT
+          })
+        } else {
+          global.snappy_gui.core = require('snappy-core')
+          global.snappy_gui.core.start().then(function() {
+            debug("local core started")
 
-          global.snappy_gui.client_IP = '127.0.0.1'
-          that.progress_connecting()
-        })
-      }
-    })
+            if (that.allPromises) {
+              that.allPromises.cancel()
+            }
+            if (that.forcedLocalPromise) {
+              that.forcedLocalPromise.cancel()
+            }
+
+            global.snappy_gui.client_IP = '127.0.0.1'
+
+          })
+        }
+      })
+    }, 500)
   },
   connect_core: function(event, arg) {
     var that = discovery
     debug("received connect_core ipc event")
 
+    that.progress_connecting()
+
     debug("Connecting to IP:", arg)
 
-    if (that.allPromises) {
-      that.allPromises.cancel()
-    }
-    if (that.forcedLocalPromise) {
-      that.forcedLocalPromise.cancel()
-    }
-
-    global.snappy_gui.client_IP = arg
-    that.progress_connecting()
+    setTimeout(function() {
+      if (that.allPromises) {
+        that.allPromises.cancel()
+      }
+      if (that.forcedLocalPromise) {
+        that.forcedLocalPromise.cancel()
+      }
+      global.snappy_gui.client_IP = arg
+    }, 500)
   },
   progress_connecting: function() {
     var that = discovery
@@ -155,7 +159,6 @@ var discovery = {
 
     setTimeout(function() {
       global.snappy_gui.mainWindow.createWindow()
-      // that.core_view()
     }, 2000);
   },
   start_scanning: function(event, arg) {

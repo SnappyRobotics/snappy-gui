@@ -62,12 +62,16 @@
 					debug("discoveryController started");
 
 					$scope.start_core = function() {
-						ipc.send('discovery:start_core');
+						setTimeout(function() {
+							ipc.send('discovery:start_core');
+						}, 100);
 						window.location.href = '#!/connecting'
 					}
 
 					$scope.connect = function(ip) {
-						ipc.send('discovery:connect_core', ip);
+						setTimeout(function() {
+							ipc.send('discovery:connect_core', ip);
+						}, 100);
 						window.location.href = '#!/connecting'
 					}
 
