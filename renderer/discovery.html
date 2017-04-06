@@ -114,14 +114,14 @@
 					}
 
 					ipc.on("discovery:devices", function(em, devices) {
-						// debug("Got :" + devices);
+						debug("Got :" + devices);
 
 						$scope.$apply(function() {
 							$scope.devices = devices;
 						})
 					})
 					ipc.on("discovery:searching", function(em, ip) {
-						// debug("Searching for :" + ip);
+						debug("Searching for :" + ip);
 
 						$scope.$apply(function() {
 							$scope.searching = ip;
@@ -157,9 +157,6 @@
 
 					ipc.on("discovery:cancel_start_core", function(em, devices) {
 						debug("received cancel_start_core")
-						$scope.$apply(function() {
-							$scope.scanning = false
-						})
 						progress(false)
 					})
 

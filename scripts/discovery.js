@@ -110,6 +110,15 @@ var discovery = {
             that.forcedLocalPromise.cancel()
           }
 
+          that.forcedLocalPromise = discovery.ping('127.0.0.1'); // force check localhost
+          event.sender.send("discovery:searching", '127.0.0.1')
+          that.forcedLocalPromise.then(function(ip) {
+            if (ip.found) {
+              debug("Found Device at :", ip.ip)
+              event.sender.send("discovery:scan_done", [ip.ip])
+            }
+          })
+
           dialog.showMessageBox(that.win, {
             "type": "error",
             "buttons": [
@@ -122,14 +131,9 @@ var discovery = {
             that.discoveryWin()
             event.sender.send("discovery:cancel_start_core")
 
-            setTimeout(function() {
-              if (that.allPromises) {
-                that.allPromises.cancel()
-              }
-              if (that.forcedLocalPromise) {
-                that.forcedLocalPromise.cancel()
-              }
-            }, 500);
+            if (that.allPromises) {
+              that.allPromises.cancel()
+            }
           })
         } else {
           that.cancel_login = false
