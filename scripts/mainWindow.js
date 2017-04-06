@@ -92,7 +92,7 @@ var mainWindow = {
               "title": "Authentication failed",
               "message": "Error! Problem logging in"
             })
-            if (global.snappy_gui.discovery.win == null) {
+            if (!global.snappy_gui.discovery.win) {
               global.snappy_gui.discovery.createWindow()
             }
             that.win.destroy()
