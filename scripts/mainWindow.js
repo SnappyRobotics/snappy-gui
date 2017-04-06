@@ -83,19 +83,18 @@ var mainWindow = {
         if (details.statusCode != 200) {
           debug("WebRequest session : ", details)
           if (details.statusCode == 403) {
-            dialog.showMessageBox(that.win, {
-              "type": "error",
-              "buttons": [
-                "OK"
-              ],
-              "defaultId": 0,
-              "title": "Authentication failed",
-              "message": "Error! Problem logging in"
-            })
+            delete global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
+            global.snappy_gui.saveConfig()
+
+            debug("Old Token exists, deleting that token and starting login")
+
             if (!global.snappy_gui.discovery.win) {
               global.snappy_gui.discovery.createWindow()
             }
+
             that.win.destroy()
+
+            global.snappy_gui.discovery.loginForm()
           }
         }
       })
