@@ -14,11 +14,13 @@ global.snappy_gui = {}
 //--------------------------------SETTINGS--------------------------------
 
 global.snappy_gui.client_PORT = 8000
+global.snappy_gui.consts = {}
+global.snappy_gui.consts.configFile = path.join(__dirname, "data", "config.json")
 //------------------------------------------------------------------------
 
 
 try {
-  global.snappy_gui.config = JSON.parse(fs.readFileSync(path.join(__dirname, "data", "config.json")))
+  global.snappy_gui.config = JSON.parse(fs.readFileSync(global.snappy_gui.consts.configFile))
 
 } catch (e) {
   console.error("No Config File exists in userDir");
@@ -26,10 +28,11 @@ try {
 
   global.snappy_gui.config = ob
 
-  fs.writeFileSync(path.join(__dirname, "data", "config.json"), JSON.stringify(ob))
+  fs.writeFileSync(global.snappy_gui.consts.configFile, JSON.stringify(ob))
 }
+
 global.snappy_gui.saveConfig = function() {
-  fs.writeFileSync(path.join(__dirname, "data", "config.json"), JSON.stringify(global.snappy_gui.config))
+  fs.writeFileSync(global.snappy_gui.consts.configFile, JSON.stringify(global.snappy_gui.config))
 }
 
 global.snappy_gui.package = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json")))
