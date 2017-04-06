@@ -4,15 +4,43 @@ process.env.WINDOW = 'discovery'
 
 require('../setup')
 const helpers = require('./app-setup')
+
+const req = require('req-fast')
 const path = require('path')
 const fs = require('fs')
 
-const req = require('req-fast')
+const core = require('snappy-core')
 
 const debug = require('debug')("snappy:gui:test:gui:discovery_spec")
-// const core = require('snappy-core')
 
 describe('Discovery GUI', function() {
+  describe('with mock devices', function() {
+    helpers.setupTimeout(this)
+
+    var app = null
+
+    beforeEach(function() {
+      process.env.GUI_TEST = 'NOCKS'
+      return helpers.startApplication({
+        args: [path.join(__dirname, '..', '..', 'main.js')]
+      }).then(function(startedApp) {
+        app = startedApp
+      })
+    })
+
+    afterEach(function() {
+      return helpers.stopApplication(app)
+    })
+
+    it('scan with 253 fake servers', function() {
+      return app.client
+        .getMainProcessLogs().then(debug)
+        // .getRenderProcessLogs().then(debug)
+        .waitUntilWindowLoaded()
+        .waitUntilTextExists('#devices_count', '253')
+    })
+  })
+
   describe('without mock devices', function() {
     helpers.setupTimeout(this)
     var app = null
@@ -59,31 +87,16 @@ describe('Discovery GUI', function() {
         .pause(1700)
         .click('#cancelConnectingBtn')
     })
-  })
-  describe('with mock devices', function() {
-    helpers.setupTimeout(this)
 
-    var app = null
-
-    beforeEach(function() {
-      process.env.GUI_TEST = 'NOCKS'
-      return helpers.startApplication({
-        args: [path.join(__dirname, '..', '..', 'main.js')]
-      }).then(function(startedApp) {
-        app = startedApp
-      })
-    })
-
-    afterEach(function() {
-      return helpers.stopApplication(app)
-    })
-
-    it('scan with 253 fake servers', function() {
+    it('connect to existing local server', function() {
+      core.start()
       return app.client
         .getMainProcessLogs().then(debug)
-        // .getRenderProcessLogs().then(debug)
+        .getRenderProcessLogs().then(debug)
         .waitUntilWindowLoaded()
-        .waitUntilTextExists('#devices_count', '253')
+        .getText('#devices_count').should.eventually.equal('1')
+        .click(".connectBtn")
+
     })
   })
 })

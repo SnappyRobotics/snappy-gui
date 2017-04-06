@@ -35,42 +35,63 @@ var discovery = {
   },
   createWindow: function() {
     var that = discovery
-
     that.win = new BrowserWindow({
       name: "Discovery",
-      title: "Discovery",
-      frame: true,
-      resizable: true,
-      width: 600,
-      height: 400,
       webPreferences: {
         nodeIntegration: false,
         preload: path.join(__dirname, '..', 'renderer', "preload.js")
       },
       show: false
     })
-
     that.win.loadURL(url.format({
       pathname: path.join(__dirname, '..', 'renderer', 'discovery.html'),
       protocol: 'file:',
       slashes: true
     }))
 
+
+    if (!that.win_listeners_registered) {
+      that.discoveryWin()
+      that.win_listeners_registered = true
+
+      that.win.webContents.on('did-finish-load', function() {
+        debug("loaded win with discovery")
+        if (!that.win.isVisible()) {
+          that.win.show()
+        }
+      })
+    }
+  },
+  discoveryWin: function() {
+    var that = discovery
+
+    that.win.setContentSize(600, 400)
+    that.win.setResizable(true)
+    that.win.setMovable(true)
+    that.win.setMaximizable(true)
+    that.win.setMinimizable(true)
+    that.win.setFullScreenable(false)
+    that.win.setClosable(true)
+    that.win.setAlwaysOnTop(false)
+    that.win.center()
+    that.win.setProgressBar(0)
+    that.win.setMenuBarVisibility(false)
+    that.win.setTitle("Discovery")
+
     // Chrome developer tools
     // win.webContents.openDevTools({
     //   // detach: true
     // });
 
-    that.win.webContents.on('did-finish-load', function() {
-      debug("loaded win with discovery")
-      that.win.show()
-    })
+    if (!that.discovery_listeners_registered) {
+      that.discovery_listeners_registered = true
 
-    ipcMain.on('discovery:start_core', that.start_core)
+      ipcMain.on('discovery:start_core', that.start_core)
 
-    ipcMain.on('discovery:connect_core', that.connect_core)
+      ipcMain.on('discovery:connect_core', that.connect_core)
 
-    ipcMain.on('discovery:start_scanning', that.start_scanning)
+      ipcMain.on('discovery:start_scanning', that.start_scanning)
+    }
   },
   start_core: function(event, arg) {
     var that = discovery
@@ -80,16 +101,14 @@ var discovery = {
 
       that.isPortTaken(function(err, ans) {
         if (ans) {
-          event.sender.send("discovery:cancel_start_core")
+          that.cancel_login = true
 
-          that.forcedLocalPromise = discovery.ping('127.0.0.1'); // force check localhost
-          that.forcedLocalPromise.then(function(ip) {
-            event.sender.send("discovery:searching", ip.ip)
-            if (ip.found) {
-              debug("Found Device at :", ip.ip)
-              event.sender.send("discovery:devices", [ip.ip])
-            }
-          })
+          if (that.allPromises) {
+            that.allPromises.cancel()
+          }
+          if (that.forcedLocalPromise) {
+            that.forcedLocalPromise.cancel()
+          }
 
           dialog.showMessageBox(that.win, {
             "type": "error",
@@ -99,8 +118,22 @@ var discovery = {
             "defaultId": 0,
             "title": "uncaughtException Error",
             "message": "Error! Port already in use :" + global.snappy_gui.client_PORT
+          }, function() {
+            that.discoveryWin()
+            event.sender.send("discovery:cancel_start_core")
+
+            setTimeout(function() {
+              if (that.allPromises) {
+                that.allPromises.cancel()
+              }
+              if (that.forcedLocalPromise) {
+                that.forcedLocalPromise.cancel()
+              }
+            }, 500);
           })
         } else {
+          that.cancel_login = false
+
           global.snappy_gui.core = require('snappy-core')
           global.snappy_gui.core.start().then(function() {
             debug("local core started")
@@ -122,6 +155,8 @@ var discovery = {
   connect_core: function(event, arg) {
     var that = discovery
     debug("received connect_core ipc event")
+
+    that.cancel_login = false
 
     that.progress_connecting()
 
@@ -159,7 +194,9 @@ var discovery = {
     })
 
     setTimeout(function() {
-      that.loginForm()
+      if (!that.cancel_login) {
+        that.loginForm()
+      }
     }, 3000);
   },
   loginForm: function() {
@@ -185,42 +222,46 @@ var discovery = {
 
       that.win.webContents.send('login:loaded')
 
-      that.win.webContents.on('did-finish-load', function() {
-        debug("loaded win with discovery:loginForm")
-      })
+      if (!that.login_listeners_registered) {
+        that.login_listeners_registered = true
 
-      ipcMain.on('discovery:cancel_login', function(event, arg) {
-        that.quit()
-      })
+        that.win.webContents.on('did-finish-load', function() {
+          debug("loaded win with discovery:loginForm")
+        })
 
-      ipcMain.on('discovery:login', function(event, arg) {
-        unirest.post("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/login")
-          .headers({
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          })
-          .send(arg)
-          .end(function(response) {
-            if (response.error) {
-              event.sender.send("login:error", response.body)
-              return
-            } else {
-              if (response.body.success) {
-                if (!global.snappy_gui.config.token) {
-                  global.snappy_gui.config.token = {}
+        ipcMain.on('discovery:cancel_login', function(event, arg) {
+          that.quit()
+        })
+
+        ipcMain.on('discovery:login', function(event, arg) {
+          unirest.post("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/login")
+            .headers({
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            })
+            .send(arg)
+            .end(function(response) {
+              if (response.error) {
+                event.sender.send("login:error", response.body)
+                return
+              } else {
+                if (response.body.success) {
+                  if (!global.snappy_gui.config.token) {
+                    global.snappy_gui.config.token = {}
+                  }
+                  global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT] = response.body.token
+
+                  if (arg.toSaveCheckBox) {
+                    global.snappy_gui.saveConfig()
+                  }
+                  //event.sender.send("login:success")
+
+                  global.snappy_gui.mainWindow.createWindow()
                 }
-                global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT] = response.body.token
-
-                if (arg.toSaveCheckBox) {
-                  global.snappy_gui.saveConfig()
-                }
-                //event.sender.send("login:success")
-
-                global.snappy_gui.mainWindow.createWindow()
               }
-            }
-          });
-      })
+            });
+        })
+      }
     }
   },
   start_scanning: function(event, arg) {
