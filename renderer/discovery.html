@@ -159,6 +159,7 @@
 					debug("loginController started");
 					$scope.device = window.device
 					$scope.user = {}
+					$scope.user.toSaveCheckBox = true
 					$scope.close_login = function() {
 						ipc.send('discovery:cancel_login');
 					}

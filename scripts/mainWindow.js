@@ -63,13 +63,13 @@ var mainWindow = {
       slashes: true
     })
 
-    debug("Applying token :", global.snappy_gui.config.token)
+    debug("Applying token :", global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT])
 
     session
       .defaultSession
       .webRequest
       .onBeforeSendHeaders(function(details, callback) {
-        details.requestHeaders['x-access-token'] = global.snappy_gui.config.token
+        details.requestHeaders['x-access-token'] = global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
         callback({
           cancel: false,
           requestHeaders: details.requestHeaders
@@ -90,7 +90,7 @@ var mainWindow = {
               ],
               "defaultId": 0,
               "title": "Authentication failed",
-              "message": "Error! not logged in"
+              "message": "Error! Problem logging in"
             })
             if (global.snappy_gui.discovery.win == null) {
               global.snappy_gui.discovery.createWindow()

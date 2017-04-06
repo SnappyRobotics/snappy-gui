@@ -165,52 +165,63 @@ var discovery = {
   loginForm: function() {
     var that = discovery
 
-    debug("showing loginForm")
-    that.win.setContentSize(240, 300)
-    that.win.setResizable(false)
-    that.win.setMovable(true)
-    that.win.setMaximizable(false)
-    that.win.setMinimizable(true)
-    that.win.setFullScreenable(false)
-    that.win.setClosable(true)
-    that.win.setAlwaysOnTop(false)
-    that.win.center()
-    that.win.setProgressBar(0)
-    that.win.setMenuBarVisibility(false)
-    that.win.setTitle("Login")
+    if (global.snappy_gui.config.token && global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]) {
+      debug("Found saved token")
+      global.snappy_gui.mainWindow.createWindow()
+    } else {
+      debug("showing loginForm")
+      that.win.setContentSize(240, 340)
+      that.win.setResizable(false)
+      that.win.setMovable(true)
+      that.win.setMaximizable(false)
+      that.win.setMinimizable(true)
+      that.win.setFullScreenable(false)
+      that.win.setClosable(true)
+      that.win.setAlwaysOnTop(false)
+      that.win.center()
+      that.win.setProgressBar(0)
+      that.win.setMenuBarVisibility(false)
+      that.win.setTitle("Login")
 
-    that.win.webContents.send('login:loaded')
+      that.win.webContents.send('login:loaded')
 
-    that.win.webContents.on('did-finish-load', function() {
-      debug("loaded win with discovery:loginForm")
-    })
+      that.win.webContents.on('did-finish-load', function() {
+        debug("loaded win with discovery:loginForm")
+      })
 
-    ipcMain.on('discovery:cancel_login', function(event, arg) {
-      that.quit()
-    })
+      ipcMain.on('discovery:cancel_login', function(event, arg) {
+        that.quit()
+      })
 
-    ipcMain.on('discovery:login', function(event, arg) {
-      unirest.post("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/login")
-        .headers({
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        })
-        .send(arg)
-        .end(function(response) {
-          if (response.error) {
-            event.sender.send("login:error", response.body)
-            return
-          } else {
-            event.sender.send("login:success")
-            if (response.body.success) {
-              global.snappy_gui.config.token = response.body.token
-              global.snappy_gui.saveConfig()
-              global.snappy_gui.mainWindow.createWindow()
+      ipcMain.on('discovery:login', function(event, arg) {
+        unirest.post("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/login")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          })
+          .send(arg)
+          .end(function(response) {
+            if (response.error) {
+              event.sender.send("login:error", response.body)
+              return
+            } else {
+              if (response.body.success) {
+                if (!global.snappy_gui.config.token) {
+                  global.snappy_gui.config.token = {}
+                }
+                global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT] = response.body.token
+
+                if (arg.toSaveCheckBox) {
+                  global.snappy_gui.saveConfig()
+                }
+                //event.sender.send("login:success")
+
+                global.snappy_gui.mainWindow.createWindow()
+              }
             }
-            debug(response.body)
-          }
-        });
-    })
+          });
+      })
+    }
   },
   start_scanning: function(event, arg) {
     var that = discovery
