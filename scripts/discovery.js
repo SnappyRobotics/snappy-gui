@@ -139,6 +139,8 @@ var discovery = {
           that.cancel_login = false
 
           global.snappy_gui.core = require('snappy-core')
+          global.snappy_gui.client_IP = '127.0.0.1'
+
           global.snappy_gui.core.start().then(function() {
             debug("local core started")
 
@@ -148,9 +150,6 @@ var discovery = {
             if (that.forcedLocalPromise) {
               that.forcedLocalPromise.cancel()
             }
-
-            global.snappy_gui.client_IP = '127.0.0.1'
-
           })
         }
       })
