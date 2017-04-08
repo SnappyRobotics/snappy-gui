@@ -1,6 +1,6 @@
 {
   "name": "snappy-gui",
-  "version": "0.0.2",
+  "version": "0.4.76",
   "description": "Snappy Robotics GUI",
   "main": "main.js",
   "scripts": {
