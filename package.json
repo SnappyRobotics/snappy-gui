@@ -33,6 +33,7 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "bower": "^1.8.0",
+    "debug": "^2.6.3",
     "electron-debug": "^1.1.0",
     "ip": "^1.1.5",
     "netmask": "^1.0.6",
