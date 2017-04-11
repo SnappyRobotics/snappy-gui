@@ -102,14 +102,14 @@ var mainWindow = {
                 "detail": "You need to reconnect"
               }, function(res) {
                 debug("Done ....", res)
+                that.win.destroy()
                 global.snappy_gui.discovery.discoveryWin()
                 global.snappy_gui.discovery.win.show()
               })
+            } else {
+              that.win.destroy()
+              global.snappy_gui.discovery.loginForm()
             }
-
-            that.win.destroy()
-
-            global.snappy_gui.discovery.loginForm()
           }
         }
       })
