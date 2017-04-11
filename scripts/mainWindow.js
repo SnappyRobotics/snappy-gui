@@ -90,6 +90,21 @@ var mainWindow = {
 
             if (!global.snappy_gui.discovery.win) {
               global.snappy_gui.discovery.createWindow()
+
+              dialog.showMessageBox(global.snappy_gui.discovery.win, {
+                "type": "error",
+                "buttons": [
+                  "close"
+                ],
+                "defaultId": 0,
+                "title": "Token Expired",
+                "message": "Your login session expired!",
+                "detail": "You need to reconnect"
+              }, function(res) {
+                debug("Done ....", res)
+                global.snappy_gui.discovery.discoveryWin()
+                global.snappy_gui.discovery.win.show()
+              })
             }
 
             that.win.destroy()
