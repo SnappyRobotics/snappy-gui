@@ -2,6 +2,9 @@
 
 process.env.WINDOW = 'discovery'
 
+global.snappy_gui = {}
+global.snappy_gui.client_PORT = 8000
+
 require('../setup')
 const helpers = require('./app-setup')
 
@@ -92,21 +95,43 @@ describe('Discovery GUI', function() {
     helpers.setupTimeout(this)
     var app = null
 
+    var isPortTaken = function(fn) {
+      var net = require('net')
+      var tester = net.createServer()
+        .once('error', function(err) {
+          if (err.code != 'EADDRINUSE') {
+            return fn(err)
+          }
+          debug("Error! Port already in use :", global.snappy_gui.client_PORT)
+          fn(null, true)
+        })
+        .once('listening', function() {
+          tester.once('close', function() {
+              fn(null, false)
+            })
+            .close()
+        })
+        .listen(global.snappy_gui.client_PORT)
+    }
+
     beforeEach(function(done) {
       delete process.env.GUI_TEST
-      core.start().then(function() {
-        // setTimeout(function() {
-
-        helpers.startApplication({
-          args: [path.join(__dirname, '..', '..', 'main.js')]
-        }).then(function(startedApp) {
-          app = startedApp
+      isPortTaken(function(err, isIt) {
+        if (isIt) {
+          debug("Port already taken")
           done()
-        })
-        // }, 2000);
+        } else {
+          core.start().then(function() {
+            helpers.startApplication({
+              args: [path.join(__dirname, '..', '..', 'main.js')]
+            }).then(function(startedApp) {
+              app = startedApp
+              done()
+            })
+          })
+        }
       })
     })
-
 
     afterEach(function() {
       core.stop()

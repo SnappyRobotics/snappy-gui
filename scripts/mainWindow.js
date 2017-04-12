@@ -157,7 +157,7 @@ var mainWindow = {
     })
 
     const menu = Menu.buildFromTemplate(menuTemplate)
-    Menu.setApplicationMenu(menu)
+    that.win.setMenu(menu)
 
     var u = url.format({
       pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT,
