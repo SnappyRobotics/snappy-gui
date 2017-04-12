@@ -39,11 +39,13 @@ describe('Discovery GUI', function() {
       return app.client
         .getMainProcessLogs().then(debug)
         // .getRenderProcessLogs().then(debug)
-        .waitUntilWindowLoaded()
+        .pause(500)
+        // .waitUntilWindowLoaded()
         .waitUntilTextExists('#devices_count', '253')
     })
   })
 
+  /*
   describe('without mock devices', function() {
     helpers.setupTimeout(this)
     var app = null
@@ -148,5 +150,6 @@ describe('Discovery GUI', function() {
       //.click(".connectBtn")
     })
   })
+  */
 
 })
