@@ -46,6 +46,7 @@ debug("=======================================================================")
 global.snappy_gui.app = app
 global.snappy_gui.discovery = require(path.join(__dirname, 'scripts', 'discovery'))
 global.snappy_gui.mainWindow = require(path.join(__dirname, 'scripts', 'mainWindow'))
+global.snappy_gui.UIWindow = require(path.join(__dirname, 'scripts', 'UIWindow'))
 
 //=============================================================================
 

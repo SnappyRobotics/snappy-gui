@@ -18,7 +18,7 @@ const url = require('url')
 const fs = require('fs')
 const os = require('os')
 
-const debug = require('debug')("snappy:gui:mainWindow")
+const debug = require('debug')("snappy:gui:UIWindow")
 
 Promise.config({
   // Enable warnings
@@ -90,17 +90,17 @@ const menuTemplate = [{
   {
     label: 'Server',
     submenu: [{
-      label: 'Open UI',
+      label: 'Switch to Editor',
       accelerator: 'CmdOrCtrl+U',
       click(item, focusedWindow) {
 
-        if (global.snappy_gui.UIWindow.win) {
+        if (global.snappy_gui.mainWindow.win) {
           debug("Focusing")
-          global.snappy_gui.UIWindow.win.focus()
+          global.snappy_gui.mainWindow.win.focus()
         } else {
-          global.snappy_gui.UIWindow.createWindow()
+          global.snappy_gui.mainWindow.createWindow()
         }
-        debug("Opening UI")
+        debug("Switching back to mainWindow")
       }
     }]
   },
@@ -125,11 +125,11 @@ const menuTemplate = [{
   }
 ]
 
-var mainWindow = {
+var UIWindow = {
   createWindow: function() {
-    var that = mainWindow
+    var that = UIWindow
 
-    debug("createWindow of mainWindow")
+    debug("createWindow of UIWindow")
 
     if (!global.snappy_gui.client_IP) {
       global.snappy_gui.client_IP = '127.0.0.1'
@@ -141,10 +141,10 @@ var mainWindow = {
     } = electron.screen.getPrimaryDisplay().workAreaSize
 
     that.win = new BrowserWindow({
-      title: "Snappy Robotics",
+      title: "UI:Snappy Robotics",
       webPreferences: {
         nodeIntegration: false,
-        preload: path.join(__dirname, '..', 'renderer', "preload_mainWindow.js")
+        preload: path.join(__dirname, '..', 'renderer', "preload_UIWindow.js")
       },
       width: width,
       height: height,
@@ -153,10 +153,10 @@ var mainWindow = {
     })
 
     const menu = Menu.buildFromTemplate(menuTemplate)
-    Menu.setApplicationMenu(menu)
+    that.win.setMenu(menu)
 
     var u = url.format({
-      pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT,
+      pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/api/ui",
       protocol: 'http:',
       slashes: true
     })
@@ -222,48 +222,14 @@ var mainWindow = {
     debug('Loading : ', u)
     that.win.loadURL(u)
 
-
-    that.win.on('close', function(e) {
-      debug("Closing... mainWindow")
-      that.win.webContents.executeJavaScript('window.isDeployed()', function(deployed) {
-        debug('isDeployed:', deployed);
-        if (!deployed) {
-          dialog.showMessageBox(that.win, {
-            "type": "question",
-            "buttons": [
-              "Close without saving",
-              "Cancel"
-            ],
-            "defaultId": 1,
-            "title": "Unsaved changes",
-            "message": "Do you want to discard the changes you made?",
-            "detail": "Check the blue dots on the nodes for unsaved changes"
-          }, function(res) {
-            if (res + '' === '0') { //Close without saving
-              debug("Dont want to save, hence closing")
-              that.win.destroy()
-            } else {
-              debug("Preventing default for closing")
-              e.preventDefault()
-            }
-          })
-        }
-      });
-    })
-
     that.win.on('unresponsive', function() {
-      debug("unresponsive... mainWindow")
+      debug("unresponsive... UIWindow")
     })
 
     that.win.webContents.on('did-finish-load', function() {
-      debug('Loaded main Window')
+      debug('Loaded UI Window')
       that.win.show()
-
-      if (global.snappy_gui.discovery.win) {
-        global.snappy_gui.discovery.win.close()
-        delete global.snappy_gui.discovery.win
-      }
     })
   }
 }
-module.exports = mainWindow
+module.exports = UIWindow
