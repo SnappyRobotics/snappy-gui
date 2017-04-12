@@ -58,7 +58,7 @@ var mainWindow = {
     })
 
     var u = url.format({
-      pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/red",
+      pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT,
       protocol: 'http:',
       slashes: true
     })
