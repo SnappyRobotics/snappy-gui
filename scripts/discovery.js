@@ -111,7 +111,7 @@ var discovery = {
               debug("Found Device at :", ip.ip)
               event.sender.send("discovery:scan_done", [ip.ip])
             }
-          })
+          }).catch(console.log.bind(console))
 
           dialog.showMessageBox(that.win, {
             "type": "error",
@@ -144,7 +144,7 @@ var discovery = {
             if (that.forcedLocalPromise) {
               that.forcedLocalPromise.cancel()
             }
-          })
+          }).catch(console.log.bind(console))
         }
       })
     }, 500)
@@ -278,7 +278,7 @@ var discovery = {
             retAr.push(ip.ip)
             event.sender.send("discovery:devices", retAr)
           }
-        })
+        }).catch(console.log.bind(console))
         ar.push(promise)
       }
 
@@ -292,7 +292,7 @@ var discovery = {
           debug("Scanning completed with some error")
           event.sender.send("discovery:scan_done", [])
         })
-    })
+    }).catch(console.log.bind(console))
   },
   ips: function() {
     return new Promise(function(resolve, reject, onCancel) {
@@ -350,7 +350,7 @@ var discovery = {
           })
         }
         resolve(ar)
-      })
+      }).catch(console.log.bind(console))
     })
   },
   autoScan: function() {
@@ -378,10 +378,11 @@ var discovery = {
             debug("Scanning complete")
             resolve(retAr)
           })
+          .catch(console.log.bind(console))
           .finally(function() {
             resolve([])
           })
-      })
+      }).catch(console.log.bind(console))
     })
   },
   ping: function(ip) {

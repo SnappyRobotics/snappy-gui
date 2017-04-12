@@ -45,7 +45,7 @@ exports.startApplication = function(options) {
     assert.equal(app.isRunning(), true)
     chaiAsPromised.transferPromiseness = app.transferPromiseness
     return app
-  })
+  }).catch(console.log.bind(console))
 }
 
 exports.stopApplication = function(app) {
@@ -55,5 +55,5 @@ exports.stopApplication = function(app) {
 
   return app.stop().then(function() {
     assert.equal(app.isRunning(), false)
-  })
+  }).catch(console.log.bind(console))
 }

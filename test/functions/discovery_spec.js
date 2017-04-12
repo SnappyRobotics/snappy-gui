@@ -38,7 +38,7 @@ describe('Discovery class functions', function() {
           expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
           expect(ip).to.have.property('found').that.is.a('boolean').which.is.true
           done()
-        })
+        }).catch(console.log.bind(console))
     })
     it('Test Ping function with non snappy response', function(done) {
       nock('http://127.0.0.1:8000')
@@ -56,7 +56,7 @@ describe('Discovery class functions', function() {
           expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
           expect(ip).to.have.property('found').that.is.a('boolean').which.is.false
           done()
-        })
+        }).catch(console.log.bind(console))
     })
 
     it('Test getRange function', function(done) {
@@ -72,7 +72,7 @@ describe('Discovery class functions', function() {
           }
           expect(arr.length).to.be.equal(253) //our netmask generates 253 IPs
           done()
-        })
+        }).catch(console.log.bind(console))
     })
 
     it('Check ping for 253 existing nodes', function(done) {
@@ -104,7 +104,7 @@ describe('Discovery class functions', function() {
             if (ip.found) {
               retAr.push(ip.ip)
             }
-          })
+          }).catch(console.log.bind(console))
           ar.push(promise)
         }
 
@@ -115,8 +115,8 @@ describe('Discovery class functions', function() {
             expect(retAr).to.be.an('array');
             expect(retAr.length).to.be.equal(253)
             done()
-          })
-      })
+          }).catch(console.log.bind(console))
+      }).catch(console.log.bind(console))
     })
 
     it('Check isPortTaken function with port free', function(done) {
@@ -159,7 +159,7 @@ describe('Discovery class functions', function() {
           expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
           expect(ip).to.have.property('found').that.is.a('boolean').which.is.false
           done()
-        })
+        }).catch(console.log.bind(console))
     })
 
     it('with core running', function(done) {
@@ -172,7 +172,7 @@ describe('Discovery class functions', function() {
           expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
           expect(ip).to.have.property('found').that.is.a('boolean').which.is.false
           done()
-        })
+        }).catch(console.log.bind(console))
     })
   })
 })

@@ -28,7 +28,7 @@ describe('Discovery GUI', function() {
         args: [path.join(__dirname, '..', '..', 'main.js')]
       }).then(function(startedApp) {
         app = startedApp
-      })
+      }).catch(console.log.bind(console))
     })
 
     afterEach(function() {
@@ -57,7 +57,7 @@ describe('Discovery GUI', function() {
         args: [path.join(__dirname, '..', '..', 'main.js')]
       }).then(function(startedApp) {
         app = startedApp
-      })
+      }).catch(console.log.bind(console))
     })
 
     afterEach(function() {
@@ -131,8 +131,8 @@ describe('Discovery GUI', function() {
             }).then(function(startedApp) {
               app = startedApp
               done()
-            })
-          })
+            }).catch(console.log.bind(console))
+          }).catch(console.log.bind(console))
         }
       })
     })
