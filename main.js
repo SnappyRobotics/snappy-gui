@@ -6,6 +6,7 @@ const {
 
 const fs = require('fs')
 const path = require('path')
+const userhome = require('userhome')
 
 const debug = require('debug')("snappy:gui:index")
 
@@ -15,7 +16,7 @@ global.snappy_gui = {}
 
 global.snappy_gui.client_PORT = 8000
 global.snappy_gui.consts = {}
-global.snappy_gui.consts.configFile = path.join(__dirname, "data", "config.json")
+global.snappy_gui.consts.configFile = userhome(".snappy-gui", "config.json")
 //------------------------------------------------------------------------
 
 
@@ -27,6 +28,8 @@ try {
   var ob = {}
 
   global.snappy_gui.config = ob
+
+  fs.mkdirSync(userhome(".snappy-gui"))
 
   fs.writeFileSync(global.snappy_gui.consts.configFile, JSON.stringify(ob))
 }

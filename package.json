@@ -1,13 +1,17 @@
 {
   "name": "snappy-gui",
-  "version": "0.4.76",
+  "version": "0.5.12",
   "description": "Snappy Robotics GUI",
   "main": "main.js",
   "scripts": {
     "test": "NODE_ENV=test grunt test",
     "start": "NODE_ENV=development DEBUG=snappy:* electron main.js  --debug",
     "postinstall": "./node_modules/.bin/bower install",
-    "rebuild": "electron-rebuild -f -w serialport"
+    "rebuild": "electron-rebuild -f -w serialport",
+    "package-mac": "electron-packager . --overwrite --asar=true --platform=darwin --arch=x64 --icon=data/logo/logo.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=data/logo/logo.ico --prune=true --out=release-builds --version-string.CompanyName='Snappy Robotics' --version-string.FileDescription='Snappy Robotics GUI' --version-string.ProductName='Snappy Robotics GUI'",
+    "package-linux": "electron-packager . --overwrite --asar=true --platform=linux --arch=x64 --icon=data/logo/512x512.png --prune=true --out=release-builds",
+    "package-all": "electron-packager .  --all"
   },
   "repository": {
     "type": "git",
@@ -42,6 +46,7 @@
     "serialport": "^4.0.7",
     "snappy-core": "github:snappyrobotics/snappy-core",
     "unirest": "^0.5.1",
+    "userhome": "^1.0.0",
     "when": "^3.7.8"
   },
   "devDependencies": {
@@ -51,6 +56,7 @@
     "chai-as-promised": "^6.0.0",
     "devtron": "^1.4.0",
     "electron": "^1.6.2",
+    "electron-packager": "^8.6.0",
     "electron-rebuild": "^1.5.7",
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",
