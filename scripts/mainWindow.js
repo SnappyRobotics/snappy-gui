@@ -21,14 +21,9 @@ const os = require('os')
 const debug = require('debug')("snappy:gui:mainWindow")
 
 Promise.config({
-  // Enable warnings
-  warnings: true,
   // Enable cancellation
-  cancellation: true,
-  // Enable monitoring
-  monitoring: true
+  cancellation: true
 });
-
 
 const menuTemplate = [{
     label: 'Edit',

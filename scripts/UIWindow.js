@@ -21,12 +21,8 @@ const os = require('os')
 const debug = require('debug')("snappy:gui:UIWindow")
 
 Promise.config({
-  // Enable warnings
-  warnings: true,
   // Enable cancellation
-  cancellation: true,
-  // Enable monitoring
-  monitoring: true
+  cancellation: true
 });
 
 
