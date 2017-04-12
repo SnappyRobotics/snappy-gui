@@ -5,13 +5,15 @@
   "main": "main.js",
   "scripts": {
     "test": "NODE_ENV=test grunt test",
-    "start": "NODE_ENV=development DEBUG=snappy:* electron main.js  --debug",
+    "start": "electron-forge start",
     "postinstall": "./node_modules/.bin/bower install",
     "rebuild": "electron-rebuild -f -w serialport",
     "package-mac": "electron-packager . --overwrite --asar=true --platform=darwin --arch=x64 --icon=data/logo/logo.icns --prune=true --out=release-builds",
     "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=data/logo/logo.ico --prune=true --out=release-builds --version-string.CompanyName='Snappy Robotics' --version-string.FileDescription='Snappy Robotics GUI' --version-string.ProductName='Snappy Robotics GUI'",
     "package-linux": "electron-packager . --overwrite --asar=true --platform=linux --arch=x64 --icon=data/logo/512x512.png --prune=true --out=release-builds",
-    "package-all": "electron-packager .  --all"
+    "package-all": "electron-packager .  --all",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "repository": {
     "type": "git",
@@ -38,6 +40,7 @@
     "bluebird": "^3.5.0",
     "bower": "^1.8.0",
     "debug": "^2.6.3",
+    "electron-compile": "^6.3.0",
     "electron-debug": "^1.1.0",
     "ip": "^1.1.5",
     "netmask": "^1.0.6",
@@ -50,13 +53,15 @@
     "when": "^3.7.8"
   },
   "devDependencies": {
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-preset-env": "^1.3.3",
     "babel-preset-es2015": "^6.24.0",
+    "babel-preset-react": "^6.24.1",
     "babel-register": "^6.24.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "devtron": "^1.4.0",
-    "electron": "^1.6.2",
-    "electron-packager": "^8.6.0",
+    "electron-prebuilt-compile": "1.6.2",
     "electron-rebuild": "^1.5.7",
     "grunt": "^1.0.1",
     "grunt-contrib-jshint": "^1.1.0",
@@ -64,5 +69,34 @@
     "mocha": "^3.2.0",
     "nock": "^9.0.9",
     "spectron": "^3.6.0"
+  },
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {},
+      "electronWinstallerConfig": {
+        "name": ""
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "",
+        "name": ""
+      },
+      "windowsStoreConfig": {
+        "packageName": ""
+      }
+    }
   }
 }
