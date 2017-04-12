@@ -20,16 +20,20 @@ const os = require('os')
 
 const debug = require('debug')("snappy:gui:mainWindow")
 
-Promise.config({
-  // Enable warnings
-  warnings: true,
-  // Enable long stack traces
-  longStackTraces: true,
-  // Enable cancellation
-  cancellation: true,
-  // Enable monitoring
-  monitoring: true
-});
+try {
+  Promise.config({
+    // Enable warnings
+    warnings: true,
+    // Enable long stack traces
+    longStackTraces: true,
+    // Enable cancellation
+    cancellation: true,
+    // Enable monitoring
+    monitoring: true
+  });
+} catch (e) {
+  debug(e)
+}
 
 const menuTemplate = [{
     label: 'Edit',
