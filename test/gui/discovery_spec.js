@@ -39,13 +39,13 @@ describe('Discovery GUI', function() {
       return app.client
         .getMainProcessLogs().then(debug)
         // .getRenderProcessLogs().then(debug)
-        .pause(500)
+        // .pause(500)
         // .waitUntilWindowLoaded()
         .waitUntilTextExists('#devices_count', '253')
     })
   })
 
-  /*
+
   describe('without mock devices', function() {
     helpers.setupTimeout(this)
     var app = null
@@ -67,9 +67,10 @@ describe('Discovery GUI', function() {
     it('opens discovery window with no clients', function() {
       return app.client
         .getMainProcessLogs().then(debug)
-        .getRenderProcessLogs().then(debug)
-        .waitUntilWindowLoaded()
+        // .getRenderProcessLogs().then(debug)
+        // .waitUntilWindowLoaded()
         .getWindowCount().should.eventually.equal(1)
+        /*
         .browserWindow.focus()
         .browserWindow.isMinimized().should.eventually.be.false
         .browserWindow.isDevToolsOpened().should.eventually.be.false
@@ -77,15 +78,17 @@ describe('Discovery GUI', function() {
         .browserWindow.isFocused().should.eventually.be.true
         .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
         .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
+        */
         .getTitle().should.eventually.be.equal("Discovery Wizard")
         .getText('#devices_count').should.eventually.equal('0')
     })
+
 
     it('click locally button and then click cancel', function() {
       return app.client
         .getMainProcessLogs().then(debug)
         .getRenderProcessLogs().then(debug)
-        .waitUntilWindowLoaded()
+        // .waitUntilWindowLoaded()
         .getText('#devices_count').should.eventually.equal('0')
         .pause(1000)
         .click("#localBtn")
@@ -93,6 +96,7 @@ describe('Discovery GUI', function() {
         .click('#cancelConnectingBtn')
     })
   })
+
   describe('with core', function() {
     helpers.setupTimeout(this)
     var app = null
@@ -145,11 +149,9 @@ describe('Discovery GUI', function() {
       return app.client
         .getMainProcessLogs().then(debug)
         .getRenderProcessLogs().then(debug)
-        .waitUntilWindowLoaded()
+        // .waitUntilWindowLoaded()
         .getText('#devices_count').should.eventually.equal('1')
       //.click(".connectBtn")
     })
   })
-  */
-
 })
