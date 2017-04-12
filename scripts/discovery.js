@@ -18,20 +18,15 @@ const os = require('os')
 
 const debug = require('debug')("snappy:gui:discovery")
 
-try {
-  Promise.config({
-    // Enable warnings
-    warnings: true,
-    // Enable long stack traces
-    longStackTraces: true,
-    // Enable cancellation
-    cancellation: true,
-    // Enable monitoring
-    monitoring: true
-  });
-} catch (e) {
-  debug(e)
-}
+Promise.config({
+  // Enable warnings
+  warnings: true,
+  // Enable cancellation
+  cancellation: true,
+  // Enable monitoring
+  monitoring: true
+});
+
 
 var discovery = {
   quit: function() {
