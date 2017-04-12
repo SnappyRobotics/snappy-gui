@@ -87,16 +87,41 @@ describe('Discovery GUI', function() {
         .pause(1700)
         .click('#cancelConnectingBtn')
     })
+  })
+  describe('with core', function() {
+    helpers.setupTimeout(this)
+    var app = null
+
+    beforeEach(function(done) {
+      delete process.env.GUI_TEST
+      core.start().then(function() {
+        // setTimeout(function() {
+
+        helpers.startApplication({
+          args: [path.join(__dirname, '..', '..', 'main.js')]
+        }).then(function(startedApp) {
+          app = startedApp
+          done()
+        })
+        // }, 2000);
+      })
+    })
+
+
+    afterEach(function() {
+      core.stop()
+      return helpers.stopApplication(app)
+    })
 
     it('connect to existing local server', function() {
-      core.start()
+      debug('comming to connect to server')
       return app.client
         .getMainProcessLogs().then(debug)
         .getRenderProcessLogs().then(debug)
         .waitUntilWindowLoaded()
         .getText('#devices_count').should.eventually.equal('1')
-        .click(".connectBtn")
-
+      //.click(".connectBtn")
     })
   })
+
 })
