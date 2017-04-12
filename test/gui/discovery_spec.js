@@ -40,7 +40,7 @@ describe('Discovery GUI', function() {
         .getMainProcessLogs().then(debug)
         // .getRenderProcessLogs().then(debug)
         // .pause(500)
-        // .waitUntilWindowLoaded()
+        .waitUntilWindowLoaded()
         .waitUntilTextExists('#devices_count', '253')
     })
   })
@@ -68,9 +68,8 @@ describe('Discovery GUI', function() {
       return app.client
         .getMainProcessLogs().then(debug)
         // .getRenderProcessLogs().then(debug)
-        // .waitUntilWindowLoaded()
+        .waitUntilWindowLoaded()
         .getWindowCount().should.eventually.equal(1)
-        /*
         .browserWindow.focus()
         .browserWindow.isMinimized().should.eventually.be.false
         .browserWindow.isDevToolsOpened().should.eventually.be.false
@@ -78,7 +77,6 @@ describe('Discovery GUI', function() {
         .browserWindow.isFocused().should.eventually.be.true
         .browserWindow.getBounds().should.eventually.have.property('width').and.be.above(0)
         .browserWindow.getBounds().should.eventually.have.property('height').and.be.above(0)
-        */
         .getTitle().should.eventually.be.equal("Discovery Wizard")
         .getText('#devices_count').should.eventually.equal('0')
     })
@@ -88,7 +86,7 @@ describe('Discovery GUI', function() {
       return app.client
         .getMainProcessLogs().then(debug)
         .getRenderProcessLogs().then(debug)
-        // .waitUntilWindowLoaded()
+        .waitUntilWindowLoaded()
         .getText('#devices_count').should.eventually.equal('0')
         .pause(1000)
         .click("#localBtn")
@@ -149,7 +147,7 @@ describe('Discovery GUI', function() {
       return app.client
         .getMainProcessLogs().then(debug)
         .getRenderProcessLogs().then(debug)
-        // .waitUntilWindowLoaded()
+        .waitUntilWindowLoaded()
         .getText('#devices_count').should.eventually.equal('1')
       //.click(".connectBtn")
     })
