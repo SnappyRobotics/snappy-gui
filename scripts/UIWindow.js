@@ -145,6 +145,7 @@ var UIWindow = {
         nodeIntegration: false,
         preload: path.join(__dirname, '..', 'renderer', "preload_UIWindow.js")
       },
+      icon: path.join(__dirname, '..', '', 'data', 'logo', '512x512.png'),
       width: width,
       height: height,
       center: true,

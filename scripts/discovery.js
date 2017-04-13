@@ -35,6 +35,7 @@ var discovery = {
         nodeIntegration: false,
         preload: path.join(__dirname, '..', 'renderer', "preload.js")
       },
+      icon: path.join(__dirname, '..', '', 'data', 'logo', '512x512.png'),
       show: false
     })
     that.win.loadURL(url.format({
