@@ -278,6 +278,7 @@ var discovery = {
             retAr.push(ip.ip)
             event.sender.send("discovery:devices", retAr)
           }
+          return
         }).catch(console.log.bind(console))
         ar.push(promise)
       }

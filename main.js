@@ -7,6 +7,7 @@ const {
 const fs = require('fs')
 const path = require('path')
 const userhome = require('userhome')
+const nodeCleanup = require('node-cleanup')
 
 const debug = require('debug')("snappy:gui:index")
 
@@ -76,10 +77,33 @@ if (global.snappy_gui.window) {
   app.on('ready', () => {
     global.snappy_gui[global.snappy_gui.window].createWindow()
   });
+}
 
-  global.snappy_gui.quit = function() {
-    if (process.platform !== 'darwin') {
-      app.quit()
-    }
+
+global.snappy_gui.quit = function() {
+  debug("quitting")
+  if (process.platform !== 'darwin') {
+    stopCore()
+    app.quit()
+  }
+}
+
+nodeCleanup(function(exitCode, signal) {
+  if (signal) {
+    stopCore(function() {
+      process.kill(process.pid, signal);
+    })
+    nodeCleanup.uninstall();
+    return false;
+  }
+})
+
+function stopCore(f) {
+  if (global.snappy_gui.core && global.snappy_gui.core.isRunning()) {
+    global.snappy_gui.core.stop().then(function() {
+      if (f) {
+        f()
+      }
+    })
   }
 }
