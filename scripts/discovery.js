@@ -278,13 +278,12 @@ var discovery = {
             retAr.push(ip.ip)
             event.sender.send("discovery:devices", retAr)
           }
-          return
         }).catch(console.log.bind(console))
         ar.push(promise)
       }
 
       that.allPromises = Promise.all(ar)
-      that.allPromises
+      return that.allPromises
         .then(function(ot) {
           debug("Scanning complete")
           event.sender.send("discovery:scan_done", retAr)
@@ -357,7 +356,7 @@ var discovery = {
   autoScan: function() {
     var retAr = []
     return new Promise(function(resolve, reject, onCancel) {
-      discovery.getRange().then(function(range) {
+      return discovery.getRange().then(function(range) {
         var ar = []
         for (var i = 0; i < range.length; i++) {
           ar.push(discovery.ping(range[i]))
@@ -369,8 +368,7 @@ var discovery = {
         onCancel(function() {
           p.cancel()
         })
-        p
-          .then(function(ot) {
+        p.then(function(ot) {
             for (var i = 0; i < ot.length; i++) {
               if (ot[i].found) {
                 retAr.push(ot[i].ip)
