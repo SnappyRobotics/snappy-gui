@@ -125,21 +125,32 @@ describe('Discovery GUI', function() {
           debug("Port already taken")
           done()
         } else {
-          core.start().then(function() {
-            helpers.startApplication({
-              args: [path.join(__dirname, '..', '..', 'main.js')]
-            }).then(function(startedApp) {
-              app = startedApp
-              done()
+          var startApp = function() {
+            core.start().then(function() {
+              helpers.startApplication({
+                args: [path.join(__dirname, '..', '..', 'main.js')]
+              }).then(function(startedApp) {
+                app = startedApp
+                done()
+              }).catch(console.log.bind(console))
             }).catch(console.log.bind(console))
-          }).catch(console.log.bind(console))
+          }
+          if (core.isRunning()) {
+            startApp()
+            core.stop().then(function() {
+              startApp()
+            }).catch(console.log.bind(console))
+          } else {
+            startApp()
+          }
         }
       })
     })
 
     afterEach(function() {
-      core.stop()
-      return helpers.stopApplication(app)
+      return core.stop().then(function() {
+        return helpers.stopApplication(app)
+      })
     })
 
     it('connect to existing local server', function() {

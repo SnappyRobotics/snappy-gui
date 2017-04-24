@@ -171,7 +171,10 @@ describe('Discovery class functions', function() {
           expect(ip).to.be.an('object')
           expect(ip).to.have.property('ip').that.is.a('string').which.equals('127.0.0.1')
           expect(ip).to.have.property('found').that.is.a('boolean').which.is.false
-          done()
+
+          core.stop().then(function() {
+            done()
+          }).catch(console.log.bind(console))
         }).catch(console.log.bind(console))
     })
   })

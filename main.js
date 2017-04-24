@@ -79,6 +79,15 @@ if (global.snappy_gui.window) {
   });
 }
 
+function stopCore(f) {
+  if (global.snappy_gui.core && global.snappy_gui.core.isRunning()) {
+    global.snappy_gui.core.stop().then(function() {
+      if (f) {
+        f()
+      }
+    })
+  }
+}
 
 global.snappy_gui.quit = function() {
   debug("quitting")
@@ -97,13 +106,3 @@ nodeCleanup(function(exitCode, signal) {
     return false;
   }
 })
-
-function stopCore(f) {
-  if (global.snappy_gui.core && global.snappy_gui.core.isRunning()) {
-    global.snappy_gui.core.stop().then(function() {
-      if (f) {
-        f()
-      }
-    })
-  }
-}
