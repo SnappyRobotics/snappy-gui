@@ -86,6 +86,27 @@ var discovery = {
       ipcMain.on('discovery:connect_core', that.connect_core)
 
       ipcMain.on('discovery:start_scanning', that.start_scanning)
+
+      ipcMain.on('discovery:stop_scanning', that.stop_scanning)
+
+      that.win.on('close', function(e) {
+        debug("Closing... discovery")
+
+        e.preventDefault();
+
+        var x = []
+        if (that.allPromises) {
+          x.push(that.allPromises.cancel())
+        }
+        if (that.forcedLocalPromise) {
+          x.push(that.forcedLocalPromise.cancel())
+        }
+        var q = Promise.all(x)
+        q.then(function() {
+          debug("done closing all promises...")
+          that.win.destroy()
+        })
+      })
     }
   },
   start_core: function(event, arg) {
@@ -149,6 +170,17 @@ var discovery = {
         }
       })
     }, 500)
+  },
+  stop_scanning: function(event, arg) {
+    var that = discovery
+    debug("stopping scanning")
+
+    if (that.allPromises) {
+      that.allPromises.cancel()
+    }
+    if (that.forcedLocalPromise) {
+      that.forcedLocalPromise.cancel()
+    }
   },
   connect_core: function(event, arg) {
     var that = discovery

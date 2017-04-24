@@ -118,6 +118,17 @@
 						}, 100);
 					}
 
+					$scope.stop_scanning = function() {
+						debug("stopping scanning")
+
+						$scope.status = "Scan cancelled";
+						$scope.scanning = false;
+
+						setTimeout(function() {
+							ipc.send('discovery:stop_scanning');
+						}, 100);
+					}
+
 					ipc.on("discovery:devices", function(em, devices) {
 						debug("Got :" + devices);
 

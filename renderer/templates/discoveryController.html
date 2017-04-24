@@ -5,6 +5,9 @@
 	<br>
 	<div ng-if="scanning">
 		<md-progress-linear md-mode="indeterminate"></md-progress-linear>
+		<md-button id="stopScanBtn" class="md-raised md-warn" ng-click="stop_scanning()">
+			Stop scanning
+		</md-button>
 		<b id="status">{{status}}</b> :{{searching}}
 	</div>
 	<div ng-if="scanning === false">
@@ -15,6 +18,10 @@
 			</md-tooltip>
 		</md-button>
 	</div>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<i>Or</i>
+	<br>
+	<br>
 	<md-button id="localBtn" class="md-raised md-primary" ng-click="start_core()">
 		Start core locally
 		<md-tooltip md-delay="500">
