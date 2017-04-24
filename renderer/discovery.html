@@ -28,7 +28,7 @@
 				<md-progress-circular md-mode="indeterminate"></md-progress-circular>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connecting ....
 				<br>
-				<md-button id="cancelConnectingBtn" ng-click="cancelLoading()">Cancel connecting</md-button>
+				<md-button id="cancelConnectingBtn" onclick="cancelLoading()">Cancel connecting</md-button>
 			</div>
 		</center>
 		<ng-view>
@@ -36,6 +36,11 @@
 		</ng-view>
 
 		<script type="text/javascript">
+			function cancelLoading() {
+				debug('cancel connecting')
+				ipc.send('cancel_connecting');
+			}
+
 			function progress(show) {
 				if (show) {
 					document.getElementById('progress').style.display = 'block'
@@ -149,11 +154,6 @@
 							});
 						}
 					})
-
-					$scope.cancelLoading = function() {
-						debug('cancel connecting')
-						ipc.send('cancel_connecting');
-					}
 
 					ipc.on("discovery:cancel_start_core", function(em, devices) {
 						debug("received cancel_start_core")

@@ -187,7 +187,8 @@ var discovery = {
     that.win.setMenuBarVisibility(false)
     that.win.setTitle("Connecting")
 
-    ipcMain.on('cancel_loading_core', function(event, arg) {
+    ipcMain.on('cancel_connecting', function(event, arg) {
+      that.cancel_login = true
       that.quit()
     })
 
