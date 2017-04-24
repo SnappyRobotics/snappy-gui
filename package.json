@@ -39,6 +39,7 @@
     "bower": "^1.8.0",
     "debug": "^2.6.3",
     "electron": "^1.6.2",
+    "electron-is": "^2.4.0",
     "ip": "^1.1.5",
     "netmask": "^1.0.6",
     "node-cleanup": "^2.1.2",

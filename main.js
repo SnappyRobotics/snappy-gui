@@ -100,6 +100,7 @@ global.snappy_gui.quit = function() {
 nodeCleanup(function(exitCode, signal) {
   if (signal) {
     stopCore(function() {
+      debug("Stopped App")
       process.kill(process.pid, signal);
     })
     nodeCleanup.uninstall();

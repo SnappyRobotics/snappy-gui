@@ -12,6 +12,8 @@ const {
 
 
 const Promise = require('bluebird')
+const unirest = require('unirest')
+const is = require('electron-is')
 const req = require('req-fast')
 const path = require('path')
 const url = require('url')
@@ -25,38 +27,9 @@ Promise.config({
   cancellation: true
 });
 
-const menuTemplate = [{
-    label: 'Edit',
-    submenu: [{
-        role: 'undo'
-      },
-      {
-        role: 'redo'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        role: 'cut'
-      },
-      {
-        role: 'copy'
-      },
-      {
-        role: 'paste'
-      },
-      {
-        role: 'pasteandmatchstyle'
-      },
-      {
-        role: 'delete'
-      },
-      {
-        role: 'selectall'
-      }
-    ]
-  },
-  {
+var menuTemplate = [{
+    role: 'File'
+  }, {
     label: 'View',
     submenu: [{
         label: 'Reload',
@@ -151,7 +124,58 @@ var mainWindow = {
       show: false
     })
 
-    const menu = Menu.buildFromTemplate(menuTemplate)
+    if (is.linux()) {
+      var x = []
+
+      for (var i = 0; i < 3; i++) {
+        x.push(menuTemplate[i])
+      }
+      x.push({
+        label: 'ROS',
+        submenu: [{
+          label: 'Run ROS core',
+          accelerator: 'CmdOrCtrl+Alt+R',
+          click(item, focusedWindow) {
+            debug('ROS core Button')
+            if (!that.isROSrunning) {
+              menuTemplate[3].submenu[0].label = 'starting ROS'
+              menuTemplate[3].submenu[0].enabled = false
+
+              unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros")
+                .headers({
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
+                })
+                .end(function(response) {
+                  if (response.error) {
+                    event.sender.send("ros:error", response.body)
+                    return
+                  } else {
+                    debug("ros-response:", response.body)
+                    that.isROSrunning = response.body.isRunning
+                    if (response.body.isRunning) {
+                      menuTemplate[3].submenu[0].label = 'Stop ROS'
+                      menuTemplate[3].submenu[0].enabled = true
+
+                      menu = Menu.buildFromTemplate(menuTemplate)
+                      that.win.setMenu(menu)
+                    }
+                  }
+                })
+            }
+          }
+        }]
+      })
+
+      for (var i = 3; i < menuTemplate.length; i++) {
+        x.push(menuTemplate[i])
+      }
+
+      menuTemplate = x
+    }
+
+    var menu = Menu.buildFromTemplate(menuTemplate)
     that.win.setMenu(menu)
 
     var u = url.format({
@@ -246,6 +270,8 @@ var mainWindow = {
               e.preventDefault()
             }
           })
+        } else {
+          global.snappy_gui.quit()
         }
       });
     })
