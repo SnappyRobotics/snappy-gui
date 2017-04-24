@@ -91,7 +91,7 @@ var discovery = {
 
       that.win.on('close', function(e) {
         debug("Closing... discovery")
-
+        /*
         e.preventDefault();
 
         var x = []
@@ -104,8 +104,25 @@ var discovery = {
         var q = Promise.all(x)
         q.then(function() {
           debug("done closing all promises...")
-          that.win.destroy()
+          if (global.snappy_gui.mainWindow.win) {
+            debug('mainWindow is Present')
+            if (that.win) {
+              debug("that window is also present")
+            } else {
+              debug('that window not present')
+            }
+
+            if (global.snappy_gui.discovery.win) {
+              debug("this window is also present")
+            } else {
+              debug('this window not present')
+            }
+            // delete that.win
+          } else {
+            that.win.destroy()
+          }
         })
+        */
       })
     }
   },
