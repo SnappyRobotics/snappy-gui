@@ -4,7 +4,7 @@
   "description": "Snappy Robotics GUI",
   "main": "main.js",
   "scripts": {
-    "test": "NODE_ENV=test DEBUG=snappy:* grunt test",
+    "test": "NODE_ENV=test grunt test",
     "start": "NODE_ENV=development DEBUG=snappy:* electron .",
     "postinstall": "./node_modules/.bin/bower install",
     "rebuild": "electron-rebuild -f -w serialport",

@@ -138,7 +138,15 @@ describe('Discovery GUI', function() {
           if (core.isRunning()) {
             startApp()
             core.stop().then(function() {
-              startApp()
+              setTimeout(function() {
+                if (core.isRunning()) {
+                  core.stop().then(function() {
+                    startApp()
+                  })
+                } else {
+                  startApp()
+                }
+              }, 1000);
             }).catch(console.log.bind(console))
           } else {
             startApp()
@@ -154,7 +162,7 @@ describe('Discovery GUI', function() {
     })
 
     it('connect to existing local server', function() {
-      debug('comming to connect to server')
+      debug('coming to connect to server')
       return app.client
         .getMainProcessLogs().then(debug)
         .getRenderProcessLogs().then(debug)
