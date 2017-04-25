@@ -124,60 +124,6 @@ var mainWindow = {
       show: false
     })
 
-    if (is.linux()) {
-      var x = []
-
-      for (var i = 0; i < 3; i++) {
-        x.push(menuTemplate[i])
-      }
-      x.push({
-        label: 'ROS',
-        submenu: [{
-          label: 'Run ROS core',
-          accelerator: 'CmdOrCtrl+Alt+R',
-          click(item, focusedWindow) {
-            debug('ROS core Button')
-            if (!that.isROSrunning) {
-              menuTemplate[3].submenu[0].label = 'starting ROS'
-              menuTemplate[3].submenu[0].enabled = false
-
-              unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros")
-                .headers({
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                  'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
-                })
-                .end(function(response) {
-                  if (response.error) {
-                    event.sender.send("ros:error", response.body)
-                    return
-                  } else {
-                    debug("ros-response:", response.body)
-                    that.isROSrunning = response.body.isRunning
-                    if (response.body.isRunning) {
-                      menuTemplate[3].submenu[0].label = 'Stop ROS'
-                      menuTemplate[3].submenu[0].enabled = true
-
-                      menu = Menu.buildFromTemplate(menuTemplate)
-                      that.win.setMenu(menu)
-                    }
-                  }
-                })
-            }
-          }
-        }]
-      })
-
-      for (var i = 3; i < menuTemplate.length; i++) {
-        x.push(menuTemplate[i])
-      }
-
-      menuTemplate = x
-    }
-
-    var menu = Menu.buildFromTemplate(menuTemplate)
-    that.win.setMenu(menu)
-
     var u = url.format({
       pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT,
       protocol: 'http:',
@@ -242,9 +188,131 @@ var mainWindow = {
         debug("Error occurred in web request session", details)
       })
 
-    debug('Loading : ', u)
-    that.win.loadURL(u)
+    var getInfo = function() {
+      return new Promise(function(resolve, reject) {
+        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/info")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          })
+          .end(function(response) {
+            resolve(response)
+          })
+      })
+    }
+    var getROSstatus = function() {
+      debug("getting getROSstatus")
+      return new Promise(function(resolve, reject) {
+        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
+          })
+          .end(function(response) {
+            resolve(response)
+          })
+      })
+    }
 
+    var rosBtnClick = function(item, focusedWindow) {
+      debug('ROS core Button')
+      if (!that.isROSrunning) {
+        menuTemplate[3].submenu[0].label = 'starting ROScore'
+        menuTemplate[3].submenu[0].enabled = false
+
+        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/start")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
+          })
+          .end(function(response) {
+            if (response.error) {
+              event.sender.send("ros:error", response.body)
+              return
+            } else {
+              debug("ros-response:", response.body)
+              that.isROSrunning = response.body.isRunning
+              if (response.body.isRunning) {
+                menuTemplate[3].submenu[0].label = 'Stop ROScore'
+                menuTemplate[3].submenu[0].enabled = true
+
+                var menu = Menu.buildFromTemplate(menuTemplate)
+                that.win.setMenu(menu)
+              }
+            }
+          })
+      } else {
+        menuTemplate[3].submenu[0].label = 'stopping ROScore'
+        menuTemplate[3].submenu[0].enabled = false
+
+        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/stop")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
+          })
+          .end(function(response) {
+            if (response.error) {
+              event.sender.send("ros:error", response.body)
+              return
+            } else {
+              debug("ros-response:", response.body)
+              that.isROSrunning = response.body.isRunning
+              if (!response.body.isRunning) {
+                menuTemplate[3].submenu[0].label = 'Start ROScore'
+                menuTemplate[3].submenu[0].enabled = true
+
+                var menu = Menu.buildFromTemplate(menuTemplate)
+                that.win.setMenu(menu)
+              }
+            }
+          })
+      }
+    }
+
+    getInfo().then(function(response) {
+      debug('Loading : ', u)
+      debug('info:', response.body)
+      that.info = response.body
+      that.win.loadURL(u)
+      return getROSstatus()
+    }).then(function(response) {
+      debug("ros-response_init:", response.body)
+      that.isROSrunning = response.body.isRunning
+      var label = "Start ROScore"
+      if (response.body.isRunning) {
+        label = 'Stop ROScore'
+      }
+      return label
+    }).then(function(label) {
+      if (that.info.isLinux) {
+        var x = []
+
+        for (var i = 0; i < 3; i++) {
+          x.push(menuTemplate[i])
+        }
+        x.push({
+          label: 'ROS',
+          submenu: [{
+            label: label,
+            accelerator: 'CmdOrCtrl+Alt+R',
+            click(item, focusedWindow) {
+              return rosBtnClick(item, focusedWindow)
+            }
+          }]
+        })
+
+        for (var i = 3; i < menuTemplate.length; i++) {
+          x.push(menuTemplate[i])
+        }
+
+        menuTemplate = x
+      }
+      var menu = Menu.buildFromTemplate(menuTemplate)
+      that.win.setMenu(menu)
+    })
 
     that.win.on('close', function(e) {
       debug("Closing... mainWindow")

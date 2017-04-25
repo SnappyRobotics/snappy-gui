@@ -15,7 +15,7 @@ global.snappy_gui = {}
 
 //--------------------------------SETTINGS--------------------------------
 
-global.snappy_gui.client_PORT = 8000
+global.snappy_gui.client_PORT = 8895
 global.snappy_gui.consts = {}
 global.snappy_gui.consts.configFile = userhome(".snappy-gui", "config.json")
 //------------------------------------------------------------------------
