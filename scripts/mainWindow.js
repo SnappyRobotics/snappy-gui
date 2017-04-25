@@ -229,11 +229,11 @@ var mainWindow = {
           .end(function(response) {
             debug("ros-boot-response:", response.body)
 
-            that.isROSBootRunning = response.body.onBoot
+            global.snappy_gui.mainWindow.isROSBootRunning = response.body.onBoot
 
             menuTemplate[3].submenu[2].label = 'Run ROS on boot'
             menuTemplate[3].submenu[2].enabled = true
-            menuTemplate[3].submenu[2].checked = that.isROSBootRunning
+            menuTemplate[3].submenu[2].checked = global.snappy_gui.mainWindow.isROSBootRunning
 
             var menu = Menu.buildFromTemplate(menuTemplate)
             that.win.setMenu(menu)
@@ -251,10 +251,10 @@ var mainWindow = {
           .end(function(response) {
             debug("ros-boot-response:", response.body)
 
-            that.isROSBootRunning = response.body.onBoot
+            global.snappy_gui.mainWindow.isROSBootRunning = response.body.onBoot
             menuTemplate[3].submenu[2].label = 'Run ROS on boot'
             menuTemplate[3].submenu[2].enabled = true
-            menuTemplate[3].submenu[2].checked = that.isROSBootRunning
+            menuTemplate[3].submenu[2].checked = global.snappy_gui.mainWindow.isROSBootRunning
 
             var menu = Menu.buildFromTemplate(menuTemplate)
             that.win.setMenu(menu)
@@ -264,7 +264,7 @@ var mainWindow = {
 
     var rosBtnClick = function(item, focusedWindow) {
       debug('ROS core Button')
-      if (!that.isROSrunning) {
+      if (!global.snappy_gui.mainWindow.isROSrunning) {
         menuTemplate[3].submenu[0].label = 'starting ROScore'
         menuTemplate[3].submenu[0].enabled = false
 
@@ -276,7 +276,7 @@ var mainWindow = {
           })
           .end(function(response) {
             debug("ros-response:", response.body)
-            that.isROSrunning = response.body.isRunning
+            global.snappy_gui.mainWindow.isROSrunning = response.body.isRunning
             if (response.body.isRunning) {
               menuTemplate[3].submenu[0].label = 'Stop ROScore'
               menuTemplate[3].submenu[0].enabled = true
@@ -297,7 +297,7 @@ var mainWindow = {
           })
           .end(function(response) {
             debug("ros-response:", response.body)
-            that.isROSrunning = response.body.isRunning
+            global.snappy_gui.mainWindow.isROSrunning = response.body.isRunning
             if (!response.body.isRunning) {
               menuTemplate[3].submenu[0].label = 'Start ROScore'
               menuTemplate[3].submenu[0].enabled = true
@@ -317,7 +317,8 @@ var mainWindow = {
       return getROSstatus()
     }).then(function(response) {
       debug("ros-response_init:", response.body)
-      that.isROSrunning = response.body.isRunning
+      global.snappy_gui.mainWindow.isROSrunning = response.body.isRunning
+      global.snappy_gui.mainWindow.isROSBootRunning = response.body.onBoot
 
       var checked = response.body.onBoot
 
