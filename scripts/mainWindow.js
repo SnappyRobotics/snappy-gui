@@ -214,6 +214,53 @@ var mainWindow = {
           })
       })
     }
+    var rosBootBtnClick = function(item, focusedWindow) {
+      debug('ROS boot Button')
+      if (!that.isROSBootRunning) {
+        menuTemplate[3].submenu[2].label = 'setting ROS on boot'
+        menuTemplate[3].submenu[2].enabled = false
+
+        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/boot/on")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
+          })
+          .end(function(response) {
+            debug("ros-boot-response:", response.body)
+
+            that.isROSBootRunning = response.body.onBoot
+
+            menuTemplate[3].submenu[2].label = 'Run ROS on boot'
+            menuTemplate[3].submenu[2].enabled = true
+            menuTemplate[3].submenu[2].checked = that.isROSBootRunning
+
+            var menu = Menu.buildFromTemplate(menuTemplate)
+            that.win.setMenu(menu)
+          })
+      } else {
+        menuTemplate[3].submenu[2].label = 'removing ROS on boot'
+        menuTemplate[3].submenu[2].enabled = false
+
+        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/boot/off")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
+          })
+          .end(function(response) {
+            debug("ros-boot-response:", response.body)
+
+            that.isROSBootRunning = response.body.onBoot
+            menuTemplate[3].submenu[2].label = 'Run ROS on boot'
+            menuTemplate[3].submenu[2].enabled = true
+            menuTemplate[3].submenu[2].checked = that.isROSBootRunning
+
+            var menu = Menu.buildFromTemplate(menuTemplate)
+            that.win.setMenu(menu)
+          })
+      }
+    }
 
     var rosBtnClick = function(item, focusedWindow) {
       debug('ROS core Button')
@@ -228,19 +275,14 @@ var mainWindow = {
             'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
           })
           .end(function(response) {
-            if (response.error) {
-              event.sender.send("ros:error", response.body)
-              return
-            } else {
-              debug("ros-response:", response.body)
-              that.isROSrunning = response.body.isRunning
-              if (response.body.isRunning) {
-                menuTemplate[3].submenu[0].label = 'Stop ROScore'
-                menuTemplate[3].submenu[0].enabled = true
+            debug("ros-response:", response.body)
+            that.isROSrunning = response.body.isRunning
+            if (response.body.isRunning) {
+              menuTemplate[3].submenu[0].label = 'Stop ROScore'
+              menuTemplate[3].submenu[0].enabled = true
 
-                var menu = Menu.buildFromTemplate(menuTemplate)
-                that.win.setMenu(menu)
-              }
+              var menu = Menu.buildFromTemplate(menuTemplate)
+              that.win.setMenu(menu)
             }
           })
       } else {
@@ -254,19 +296,14 @@ var mainWindow = {
             'x-access-token': global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT]
           })
           .end(function(response) {
-            if (response.error) {
-              event.sender.send("ros:error", response.body)
-              return
-            } else {
-              debug("ros-response:", response.body)
-              that.isROSrunning = response.body.isRunning
-              if (!response.body.isRunning) {
-                menuTemplate[3].submenu[0].label = 'Start ROScore'
-                menuTemplate[3].submenu[0].enabled = true
+            debug("ros-response:", response.body)
+            that.isROSrunning = response.body.isRunning
+            if (!response.body.isRunning) {
+              menuTemplate[3].submenu[0].label = 'Start ROScore'
+              menuTemplate[3].submenu[0].enabled = true
 
-                var menu = Menu.buildFromTemplate(menuTemplate)
-                that.win.setMenu(menu)
-              }
+              var menu = Menu.buildFromTemplate(menuTemplate)
+              that.win.setMenu(menu)
             }
           })
       }
@@ -281,12 +318,18 @@ var mainWindow = {
     }).then(function(response) {
       debug("ros-response_init:", response.body)
       that.isROSrunning = response.body.isRunning
+
+      var checked = response.body.onBoot
+
       var label = "Start ROScore"
       if (response.body.isRunning) {
         label = 'Stop ROScore'
       }
-      return label
-    }).then(function(label) {
+      return {
+        label: label,
+        checked: checked
+      }
+    }).then(function(ol) {
       if (that.info.isLinux) {
         var x = []
 
@@ -296,12 +339,24 @@ var mainWindow = {
         x.push({
           label: 'ROS',
           submenu: [{
-            label: label,
-            accelerator: 'CmdOrCtrl+Alt+R',
-            click(item, focusedWindow) {
-              return rosBtnClick(item, focusedWindow)
+              label: ol.label,
+              accelerator: 'CmdOrCtrl+Alt+R',
+              click(item, focusedWindow) {
+                return rosBtnClick(item, focusedWindow)
+              }
+            },
+            {
+              type: 'separator'
+            },
+            {
+              label: 'Run ROScore on boot',
+              type: 'checkbox',
+              checked: ol.checked,
+              click(item, focusedWindow) {
+                return rosBootBtnClick(item, focusedWindow)
+              }
             }
-          }]
+          ]
         })
 
         for (var i = 3; i < menuTemplate.length; i++) {

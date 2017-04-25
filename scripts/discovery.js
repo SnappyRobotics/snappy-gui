@@ -44,6 +44,7 @@ var discovery = {
       slashes: true
     }))
 
+    that.win.setMenu(null)
 
     if (!that.win_listeners_registered) {
       that.discoveryWin()
