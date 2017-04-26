@@ -60,7 +60,11 @@ if (process.env.WINDOW) {
 }
 
 if (process.env.NODE_ENV != 'test') {
-  global.snappy_gui.window = ['discovery', 'mainWindow'][0]
+  if (global.snappy_gui.config.same_server) {
+    global.snappy_gui.window = ['discovery', 'mainWindow'][1]
+  } else {
+    global.snappy_gui.window = ['discovery', 'mainWindow'][0]
+  }
 } else {
   if (process.env.TEST_MODE && process.env.TEST_MODE == 'GUI') {
     require(path.join(__dirname, 'test', 'gui', global.snappy_gui.window + '_nocks.js'));

@@ -167,19 +167,29 @@ var menuTemplate = [{
   {
     label: 'Server',
     submenu: [{
-      label: 'Open UI',
-      accelerator: 'CmdOrCtrl+U',
-      click(item, focusedWindow) {
+        label: 'Open UI',
+        accelerator: 'CmdOrCtrl+U',
+        click(item, focusedWindow) {
 
-        if (global.snappy_gui.UIWindow.win) {
-          debug("Focusing")
-          global.snappy_gui.UIWindow.win.focus()
-        } else {
-          global.snappy_gui.UIWindow.createWindow()
+          if (global.snappy_gui.UIWindow.win) {
+            debug("Focusing")
+            global.snappy_gui.UIWindow.win.focus()
+          } else {
+            global.snappy_gui.UIWindow.createWindow()
+          }
+          debug("Opening UI")
         }
-        debug("Opening UI")
+      },
+      {
+        label: 'Always connect to same server',
+        type: 'checkbox',
+        click(item, focusedWindow) {
+          global.snappy_gui.config.same_server = item.checked
+
+          global.snappy_gui.saveConfig()
+        }
       }
-    }]
+    ]
   },
   {
     role: 'window',
@@ -257,8 +267,10 @@ var mainWindow = {
 
             debug("Old Token exists, deleting that token and starting login")
 
-            if (!global.snappy_gui.discovery.win) {
+            if (global.snappy_gui.discovery.win === undefined) {
+              debug('creating window discovery')
               global.snappy_gui.discovery.createWindow()
+              that.win.destroy()
 
               dialog.showMessageBox(global.snappy_gui.discovery.win, {
                 "type": "error",
@@ -271,7 +283,7 @@ var mainWindow = {
                 "detail": "You need to reconnect"
               }, function(res) {
                 debug("Done ....", res)
-                that.win.destroy()
+
                 global.snappy_gui.discovery.discoveryWin()
                 global.snappy_gui.discovery.win.show()
               })
@@ -433,7 +445,13 @@ var mainWindow = {
         checked: checked
       }
     }).then(function(ol) {
-      if (that.info.hasROS) {
+      var hasROSalreadyInMenu = false
+      for (var i = 0; i < menuTemplate.length; i++) {
+        if (menuTemplate[i].label && menuTemplate[i].label === 'ROS') {
+          hasROSalreadyInMenu = true
+        }
+      }
+      if (that.info.hasROS && !hasROSalreadyInMenu) {
         var x = []
 
         for (var i = 0; i < 3; i++) {
@@ -468,6 +486,10 @@ var mainWindow = {
 
         menuTemplate = x
       }
+
+      menuTemplate[2].submenu[1].checked = global.snappy_gui.config.same_server
+
+
       var menu = Menu.buildFromTemplate(menuTemplate)
       that.win.setMenu(menu)
     })
@@ -609,9 +631,7 @@ var mainWindow = {
       debug('Loaded main Window')
       that.win.show()
 
-      setTimeout(function() {
-        that.showSaved()
-      }, 1000)
+      that.showSaved()
 
       if (global.snappy_gui.discovery.win) {
         global.snappy_gui.discovery.win.close()
