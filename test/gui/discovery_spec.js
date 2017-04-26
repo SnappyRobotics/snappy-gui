@@ -3,7 +3,7 @@
 process.env.WINDOW = 'discovery'
 
 global.snappy_gui = {}
-global.snappy_gui.client_PORT = 8000
+global.snappy_gui.client_PORT = 8895
 
 require('../setup')
 const helpers = require('./app-setup')

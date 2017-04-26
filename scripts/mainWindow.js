@@ -427,8 +427,8 @@ var mainWindow = {
           ]
         })
 
-        for (var i = 3; i < menuTemplate.length; i++) {
-          x.push(menuTemplate[i])
+        for (var j = 3; j < menuTemplate.length; j++) {
+          x.push(menuTemplate[j])
         }
 
         menuTemplate = x

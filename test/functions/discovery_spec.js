@@ -23,7 +23,7 @@ describe('Discovery class functions', function() {
 
   describe('with mock device core servers', function() {
     it('Test Ping function', function(done) {
-      nock('http://127.0.0.1:8000')
+      nock('http://127.0.0.1:8895')
         .get('/info')
         .reply(200, {
           name: "Snappy Robotics Software",
@@ -41,7 +41,7 @@ describe('Discovery class functions', function() {
         }).catch(console.log.bind(console))
     })
     it('Test Ping function with non snappy response', function(done) {
-      nock('http://127.0.0.1:8000')
+      nock('http://127.0.0.1:8895')
         .get('/info')
         .reply(200, {
           name: "Snappy Robotics Software",
@@ -77,7 +77,7 @@ describe('Discovery class functions', function() {
 
     it('Check ping for 253 existing nodes', function(done) {
       this.timeout(10000)
-      nock(/192.168.108.([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]):8000/)
+      nock(/192.168.108.([0-9]{1,2}|1[0-9]{2}|2[0-4][0-9]|25[0-5]):8895/)
         .get('/info')
         .times(253)
         .reply(200, {
