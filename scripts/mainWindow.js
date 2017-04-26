@@ -30,93 +30,111 @@ Promise.config({
 
 var menuTemplate = [{
     label: 'File',
-    submenu: [{
-      label: 'New Flow',
-      accelerator: 'CmdOrCtrl+N',
-      click(item, focusedWindow) {
-        debug('New flow')
-      }
-    }, {
-      type: 'separator'
-    }, {
-      label: 'New Project',
-      accelerator: 'CmdOrCtrl+Shift+N',
-      click(item, focusedWindow) {
-        debug('New flows')
-        dialog.showMessageBox(focusedWindow, {
-          "type": "question",
-          "buttons": [
-            "DELETE deployed Flows",
-            "Cancel"
-          ],
-          "defaultId": 1,
-          "title": "Are you sure?",
-          "message": "Existing deployed flows would be cleaned and a new flow would be created",
-          "detail": "Are you sure ?"
-        }, function(res) {
-
-          debug("Done ....", res)
-          if (res + '' === '0') { //start new Flows Project
-            unirest.post(URI + "/flows")
-              .headers({
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Node-RED-API-Version': 'v2',
-                'Node-RED-Deployment-Type': 'full'
-              })
-              .send({
-                "flows": [{
-                  "type": "tab",
-                  "label": "Flow 1"
-                }]
-              })
-              .end(function(response) {
-                if (response.error) {
-                  debug("New Flows Error :", response.error)
-                  return
-                } else {
-                  debug("Output:", response.body)
-                  focusedWindow.reload()
+    submenu: [
+      /*{
+        label: 'New Flow',
+        accelerator: 'CmdOrCtrl+N',
+        click(item, focusedWindow) {
+          debug('New flow')
+        }
+      }, {
+        type: 'separator'
+      }, {
+        label: 'New Project',
+        accelerator: 'CmdOrCtrl+Shift+N',
+        click(item, focusedWindow) {
+          debug('New flows')
+          dialog.showMessageBox(focusedWindow, {
+            "type": "question",
+            "buttons": [
+              "DELETE deployed Flows",
+              "Cancel"
+            ],
+            "defaultId": 1,
+            "title": "Are you sure?",
+            "message": "Existing deployed flows would be cleaned and a new flow would be created",
+            "detail": "Are you sure ?"
+          }, function(res) {
+            if (res + '' === '0') { //start new Flows Project
+              unirest.get(URI + "/flows")
+                .headers({
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Node-RED-API-Version': 'v2',
+                  'Node-RED-Deployment-Type': 'full'
+                })
+                .end(function(respo) {
+                  debug('respo.body.rev...:', respo.body.rev)
+                  if (respo.error) {
+                    debug("New Flows Error :", respo.error)
+                    return
+                  } else {
+                    unirest.post(URI + "/flows")
+                      .headers({
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Node-RED-API-Version': 'v2',
+                        'Node-RED-Deployment-Type': 'full'
+                      })
+                      .send({
+                        "rev": respo.body.rev,
+                        "flows": [{
+                          "type": "tab",
+                          "label": "Flow 1"
+                        }]
+                      })
+                      .end(function(response) {
+                        if (response.error) {
+                          debug("New Flows Error :", response.error)
+                          return
+                        } else {
+                          debug("Output:", response.body)
+                          focusedWindow.reload()
+                        }
+                      })
+                  }
+                })
+            }
+          })
+        }
+      }, {
+        label: 'Load Project',
+        accelerator: 'CmdOrCtrl+O',
+        click(item, focusedWindow) {
+          debug('Load flow')
+        }
+      },
+      */
+      {
+        label: 'Save Project',
+        accelerator: 'CmdOrCtrl+S',
+        click(item, focusedWindow) {
+          debug('save flows')
+          global.snappy_gui.mainWindow.win.webContents.executeJavaScript('window.isDeployed()', function(deployed) {
+            debug('isDeployed:', deployed);
+            if (!deployed) {
+              dialog.showMessageBox(focusedWindow, {
+                "type": "question",
+                "buttons": [
+                  "Discard changes and save",
+                  "Cancel"
+                ],
+                "defaultId": 1,
+                "title": "Are you sure?",
+                "message": "Do you want to delete Undeployed changes?",
+                "detail": "undeployed changes cannot be saved."
+              }, function(res) {
+                if (res + '' === '0') {
+                  global.snappy_gui.mainWindow.saveFlows();
                 }
               })
-          }
-        })
+            } else {
+              global.snappy_gui.mainWindow.saveFlows();
+            }
+          })
+        }
       }
-    }, {
-      label: 'Load Project',
-      accelerator: 'CmdOrCtrl+O',
-      click(item, focusedWindow) {
-        debug('Load flow')
-      }
-    }, {
-      label: 'Save Project',
-      accelerator: 'CmdOrCtrl+S',
-      click(item, focusedWindow) {
-        debug('save flows')
-        global.snappy_gui.mainWindow.win.webContents.executeJavaScript('window.isDeployed()', function(deployed) {
-          debug('isDeployed:', deployed);
-          if (!deployed) {
-            dialog.showMessageBox(focusedWindow, {
-              "type": "question",
-              "buttons": [
-                "Discard changes and save",
-                "Cancel"
-              ],
-              "defaultId": 1,
-              "title": "Are you sure?",
-              "message": "Do you want to delete Undeployed changes?",
-              "detail": "undeployed changes cannot be saved."
-            }, function(res) {
-              if (res + '' === '0') {
-                global.snappy_gui.mainWindow.saveFlows();
-              }
-            })
-          } else {
-            global.snappy_gui.mainWindow.saveFlows();
-          }
-        })
-      }
-    }]
+    ]
   }, {
     label: 'View',
     submenu: [{
@@ -556,10 +574,10 @@ var mainWindow = {
         })
         .end(function(response) {
           if (response.error) {
-            debug("New Flows Error :", response.error)
+            debug("save Flows Error :", response.error)
             return
           } else {
-            debug("Output:", response.body)
+            // debug("Output:", response.body)
             if (!that.saveFile) {
               dialog.showSaveDialog({
                 title: "Save Project",
