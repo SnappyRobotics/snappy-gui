@@ -454,8 +454,8 @@ var mainWindow = {
       if (that.info.hasROS && !hasROSalreadyInMenu) {
         var x = []
 
-        for (var i = 0; i < 3; i++) {
-          x.push(menuTemplate[i])
+        for (var k = 0; k < 3; k++) {
+          x.push(menuTemplate[k])
         }
         x.push({
           label: 'ROS',
@@ -578,7 +578,7 @@ var mainWindow = {
     }
 
     if (!that.mainWindow_listeners_registered) {
-      that.mainWindow_listeners_registered
+      that.mainWindow_listeners_registered = true
 
       ipcMain.on('mainWindow:onDeploy', that.onDeploy)
     }
@@ -609,7 +609,9 @@ var mainWindow = {
                   extensions: ['snappy']
                 }]
               }, function(fileName) {
-                if (fileName === undefined) return;
+                if (fileName === undefined) {
+                  return;
+                }
 
                 that.saveFile = fileName
                 that.lastSavedREV = response.body.rev

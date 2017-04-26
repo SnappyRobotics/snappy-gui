@@ -7,6 +7,6 @@ window.isDeployed = function() {
 }
 $(function() {
   $("#btn-deploy").click(function() {
-    ipc.send('mainWindow:onDeploy');
+    window.ipc.send('mainWindow:onDeploy');
   })
 })

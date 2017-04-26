@@ -160,7 +160,7 @@ describe('Discovery GUI', function() {
         return helpers.stopApplication(app)
       })
     })
-
+    /*
     it('connect to existing local server', function() {
       debug('coming to connect to server')
       return app.client
@@ -170,5 +170,6 @@ describe('Discovery GUI', function() {
         .getText('#devices_count').should.eventually.equal('1')
       //.click(".connectBtn")
     })
+    */
   })
 })
