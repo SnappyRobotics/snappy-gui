@@ -398,7 +398,7 @@ var mainWindow = {
         checked: checked
       }
     }).then(function(ol) {
-      if (that.info.isLinux) {
+      if (that.info.hasROS) {
         var x = []
 
         for (var i = 0; i < 3; i++) {
