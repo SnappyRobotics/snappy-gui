@@ -20,6 +20,7 @@ const url = require('url')
 const fs = require('fs')
 const os = require('os')
 
+var URI = ""
 const debug = require('debug')("snappy:gui:mainWindow")
 
 Promise.config({
@@ -28,7 +29,77 @@ Promise.config({
 });
 
 var menuTemplate = [{
-    role: 'File'
+    label: 'File',
+    submenu: [{
+      label: 'New Flow',
+      accelerator: 'CmdOrCtrl+N',
+      click(item, focusedWindow) {
+        debug('New flow')
+      }
+    }, {
+      label: 'New Flows Project',
+      accelerator: 'CmdOrCtrl+Shift+N',
+      click(item, focusedWindow) {
+        debug('New flows')
+        dialog.showMessageBox(focusedWindow, {
+          "type": "question",
+          "buttons": [
+            "DELETE deployed Flows",
+            "Cancel"
+          ],
+          "defaultId": 1,
+          "title": "Are you sure?",
+          "message": "Existing deployed flows would be cleaned and a new flow would be created",
+          "detail": "Are you sure ?"
+        }, function(res) {
+
+          debug("Done ....", res)
+          if (res + '' === '0') { //start new Flows Project
+            unirest.post(URI + "/flows")
+              .headers({
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Node-RED-API-Version': 'v2',
+                'Node-RED-Deployment-Type': 'full'
+              })
+              .send({
+                "flows": [{
+                  "type": "tab",
+                  "label": "Sheet 1"
+                }]
+              })
+              .end(function(response) {
+                if (response.error) {
+                  debug("New Flows Error :", response.error)
+                  return
+                } else {
+                  debug("Output:", response.body)
+                  focusedWindow.reload()
+                }
+              })
+          }
+        })
+      }
+    }, {
+      label: 'Open Flow',
+      accelerator: 'CmdOrCtrl+O',
+      click(item, focusedWindow) {
+        debug('Open flow')
+      }
+    }, {
+      type: 'separator'
+    }, {
+      label: 'Save Flow',
+      accelerator: 'CmdOrCtrl+S',
+      click(item, focusedWindow) {
+        debug('save flow')
+      }
+    }, {
+      label: 'Save All',
+      click(item, focusedWindow) {
+        debug('save all')
+      }
+    }]
   }, {
     label: 'View',
     submenu: [{
@@ -124,11 +195,7 @@ var mainWindow = {
       show: false
     })
 
-    var u = url.format({
-      pathname: global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT,
-      protocol: 'http:',
-      slashes: true
-    })
+    URI = "http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT
 
     debug("Applying token :", global.snappy_gui.config.token[global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT])
 
@@ -190,7 +257,7 @@ var mainWindow = {
 
     var getInfo = function() {
       return new Promise(function(resolve, reject) {
-        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/info")
+        unirest.get(URI + "/info")
           .headers({
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -203,7 +270,7 @@ var mainWindow = {
     var getROSstatus = function() {
       debug("getting getROSstatus")
       return new Promise(function(resolve, reject) {
-        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros")
+        unirest.get(URI + "/ros")
           .headers({
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -220,7 +287,7 @@ var mainWindow = {
         menuTemplate[3].submenu[2].label = 'setting ROS on boot'
         menuTemplate[3].submenu[2].enabled = false
 
-        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/boot/on")
+        unirest.get(URI + "/ros/boot/on")
           .headers({
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -242,7 +309,7 @@ var mainWindow = {
         menuTemplate[3].submenu[2].label = 'removing ROS on boot'
         menuTemplate[3].submenu[2].enabled = false
 
-        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/boot/off")
+        unirest.get(URI + "/ros/boot/off")
           .headers({
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -268,7 +335,7 @@ var mainWindow = {
         menuTemplate[3].submenu[0].label = 'starting ROScore'
         menuTemplate[3].submenu[0].enabled = false
 
-        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/start")
+        unirest.get(URI + "/ros/start")
           .headers({
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -289,7 +356,7 @@ var mainWindow = {
         menuTemplate[3].submenu[0].label = 'stopping ROScore'
         menuTemplate[3].submenu[0].enabled = false
 
-        unirest.get("http://" + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "/ros/stop")
+        unirest.get(URI + "/ros/stop")
           .headers({
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -310,10 +377,10 @@ var mainWindow = {
     }
 
     getInfo().then(function(response) {
-      debug('Loading : ', u)
+      debug('Loading : ', URI)
       debug('info:', response.body)
       that.info = response.body
-      that.win.loadURL(u)
+      that.win.loadURL(URI)
       return getROSstatus()
     }).then(function(response) {
       debug("ros-response_init:", response.body)
