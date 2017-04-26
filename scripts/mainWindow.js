@@ -37,7 +37,9 @@ var menuTemplate = [{
         debug('New flow')
       }
     }, {
-      label: 'New Flows Project',
+      type: 'separator'
+    }, {
+      label: 'New Project',
       accelerator: 'CmdOrCtrl+Shift+N',
       click(item, focusedWindow) {
         debug('New flows')
@@ -65,7 +67,7 @@ var menuTemplate = [{
               .send({
                 "flows": [{
                   "type": "tab",
-                  "label": "Sheet 1"
+                  "label": "Flow 1"
                 }]
               })
               .end(function(response) {
@@ -81,23 +83,38 @@ var menuTemplate = [{
         })
       }
     }, {
-      label: 'Open Flow',
+      label: 'Load Project',
       accelerator: 'CmdOrCtrl+O',
       click(item, focusedWindow) {
-        debug('Open flow')
+        debug('Load flow')
       }
     }, {
-      type: 'separator'
-    }, {
-      label: 'Save Flow',
+      label: 'Save Project',
       accelerator: 'CmdOrCtrl+S',
       click(item, focusedWindow) {
-        debug('save flow')
-      }
-    }, {
-      label: 'Save All',
-      click(item, focusedWindow) {
-        debug('save all')
+        debug('save flows')
+        global.snappy_gui.mainWindow.win.webContents.executeJavaScript('window.isDeployed()', function(deployed) {
+          debug('isDeployed:', deployed);
+          if (!deployed) {
+            dialog.showMessageBox(focusedWindow, {
+              "type": "question",
+              "buttons": [
+                "Discard changes and save",
+                "Cancel"
+              ],
+              "defaultId": 1,
+              "title": "Are you sure?",
+              "message": "Do you want to delete Undeployed changes?",
+              "detail": "undeployed changes cannot be saved."
+            }, function(res) {
+              if (res + '' === '0') {
+                global.snappy_gui.mainWindow.saveFlows();
+              }
+            })
+          } else {
+            global.snappy_gui.mainWindow.saveFlows();
+          }
+        })
       }
     }]
   }, {
@@ -471,9 +488,112 @@ var mainWindow = {
       debug("unresponsive... mainWindow")
     })
 
+    that.showSaved = function(b) {
+      debug('showSaved called')
+      /*
+      var t = 'Snappy Robotics'
+
+      debug('that.saveFile:', that.saveFile)
+
+      if (that.saveFile !== null) {
+        t += ":" + require('path').basename(that.saveFile)
+      }
+
+      debug('b', b)
+
+      if (!b) {
+        t + ":*****Not Saved*****"
+      } else {
+        if (that.saveFile !== null) {
+          t + ":Saved"
+        }
+      }
+      debug("title is :", t)
+      that.win.setTitle(t)
+      */
+    }
+
+    that.deployedREV = null
+    that.onDeploy = function() {
+      if (that.saveFile !== null) {
+        unirest.get(URI + "/flows")
+          .headers({
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Node-RED-API-Version': 'v2',
+            'Node-RED-Deployment-Type': 'full'
+          })
+          .end(function(response) {
+            if (response.error) {
+              debug("New Flows Error :", response.error)
+              return
+            } else {
+              that.deployedREV = response.body.rev
+              if (that.deployedREV != that.lastSavedREV) {
+                that.showSaved(false)
+              }
+            }
+          })
+      }
+    }
+
+    if (!that.mainWindow_listeners_registered) {
+      that.mainWindow_listeners_registered
+
+      ipcMain.on('mainWindow:onDeploy', that.onDeploy)
+    }
+
+    that.saveFile = null
+    that.lastSavedREV = null
+
+    that.saveFlows = function() {
+      unirest.get(URI + "/flows")
+        .headers({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Node-RED-API-Version': 'v2',
+          'Node-RED-Deployment-Type': 'full'
+        })
+        .end(function(response) {
+          if (response.error) {
+            debug("New Flows Error :", response.error)
+            return
+          } else {
+            debug("Output:", response.body)
+            if (!that.saveFile) {
+              dialog.showSaveDialog({
+                title: "Save Project",
+                defaultPath: '~/Project.snappy',
+                filters: [{
+                  name: 'Snappy Project file',
+                  extensions: ['snappy']
+                }]
+              }, function(fileName) {
+                if (fileName === undefined) return;
+
+                that.saveFile = fileName
+                that.lastSavedREV = response.body.rev
+
+                fs.writeFile(fileName, JSON.stringify(response.body), function(err) {
+                  if (err) {
+                    debug(err)
+                    return
+                  }
+                  debug('saved')
+                })
+              })
+            }
+          }
+        })
+    }
+
     that.win.webContents.on('did-finish-load', function() {
       debug('Loaded main Window')
       that.win.show()
+
+      setTimeout(function() {
+        that.showSaved()
+      }, 1000)
 
       if (global.snappy_gui.discovery.win) {
         global.snappy_gui.discovery.win.close()
@@ -482,4 +602,5 @@ var mainWindow = {
     })
   }
 }
+
 module.exports = mainWindow
