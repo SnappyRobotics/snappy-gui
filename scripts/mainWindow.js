@@ -13,7 +13,6 @@ const {
 
 const Promise = require('bluebird')
 const unirest = require('unirest')
-const is = require('electron-is')
 const req = require('req-fast')
 const path = require('path')
 const url = require('url')
@@ -97,14 +96,58 @@ var menuTemplate = [{
             }
           })
         }
-      }, {
+      },
+      {
         label: 'Load Project',
         accelerator: 'CmdOrCtrl+O',
         click(item, focusedWindow) {
           debug('Load flow')
+          dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [{
+              name: 'Snappy Project File',
+              extensions: ['snappy']
+            }]
+          }, function(o) {
+            var flows = JSON.parse(fs.readFileSync(o[0]))
+            debug('o.......:', o[0])
+            dialog.showMessageBox(focusedWindow, {
+              "type": "question",
+              "buttons": [
+                "Continue",
+                "Cancel"
+              ],
+              "defaultId": 1,
+              "title": "Are you sure?",
+              "message": "Existing deployed flows would be overwritten"
+            }, function(res) {
+              if (res + '' === '0') {
+                debug('Flows:', flows.flows)
+                unirest.post(URI + "/flows")
+                  .headers({
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Node-RED-API-Version': 'v2',
+                    'Node-RED-Deployment-Type': 'full'
+                  })
+                  // .send(x)
+                  .send(flows.flows)
+                  .end(function(response) {
+                    if (response.error) {
+                      debug("load Flows Error :")
+                      debug(response.error)
+                      debug(response.body)
+                      return
+                    } else {
+                      debug("Output:", response.body)
+                      focusedWindow.reload()
+                    }
+                  })
+              }
+            })
+          })
         }
       },
-      */
       {
         label: 'Save Project',
         accelerator: 'CmdOrCtrl+S',
@@ -133,9 +176,10 @@ var menuTemplate = [{
             }
           })
         }
-      }
+      }*/
     ]
-  }, {
+  },
+  {
     label: 'View',
     submenu: [{
         label: 'Reload',
@@ -184,7 +228,12 @@ var menuTemplate = [{
         label: 'Always connect to same server',
         type: 'checkbox',
         click(item, focusedWindow) {
-          global.snappy_gui.config.same_server = item.checked
+          if (item.checked) {
+
+            global.snappy_gui.config.same_server = global.snappy_gui.client_IP
+          } else {
+            global.snappy_gui.config.same_server = null
+          }
 
           global.snappy_gui.saveConfig()
         }
@@ -430,19 +479,40 @@ var mainWindow = {
       that.win.loadURL(URI)
       return getROSstatus()
     }).then(function(response) {
-      debug("ros-response_init:", response.body)
-      global.snappy_gui.mainWindow.isROSrunning = response.body.isRunning
-      global.snappy_gui.mainWindow.isROSBootRunning = response.body.onBoot
+      if (response.error.code == 'ECONNREFUSED') {
+        var s = new BrowserWindow({
+          title: "Snappy Robotics",
+          show: false
+        })
 
-      var checked = response.body.onBoot
+        that.win.destroy()
+        dialog.showMessageBox(s, {
+          "type": "error",
+          "buttons": [
+            "close"
+          ],
+          "defaultId": 0,
+          "title": "No Server found",
+          "message": "No server found at " + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT
+        }, function(res) {
+          process.exit()
+        })
+      } else {
+        debug("ros-response_init:", response.body)
+        global.snappy_gui.mainWindow.isROSrunning = response.body.isRunning
 
-      var label = "Start ROScore"
-      if (response.body.isRunning) {
-        label = 'Stop ROScore'
-      }
-      return {
-        label: label,
-        checked: checked
+        global.snappy_gui.mainWindow.isROSBootRunning = response.body.onBoot
+
+        var checked = response.body.onBoot
+
+        var label = "Start ROScore"
+        if (response.body.isRunning) {
+          label = 'Stop ROScore'
+        }
+        return {
+          label: label,
+          checked: checked
+        }
       }
     }).then(function(ol) {
       var hasROSalreadyInMenu = false
@@ -487,7 +557,7 @@ var mainWindow = {
         menuTemplate = x
       }
 
-      menuTemplate[2].submenu[1].checked = global.snappy_gui.config.same_server
+      menuTemplate[2].submenu[1].checked = (global.snappy_gui.config.same_server !== null) ? true : false
 
 
       var menu = Menu.buildFromTemplate(menuTemplate)

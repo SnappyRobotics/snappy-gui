@@ -61,6 +61,7 @@ if (process.env.WINDOW) {
 
 if (process.env.NODE_ENV != 'test') {
   if (global.snappy_gui.config.same_server) {
+    global.snappy_gui.client_IP = global.snappy_gui.config.same_server
     global.snappy_gui.window = ['discovery', 'mainWindow'][1]
   } else {
     global.snappy_gui.window = ['discovery', 'mainWindow'][0]
