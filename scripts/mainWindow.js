@@ -215,7 +215,8 @@ var menuTemplate = [{
         accelerator: 'CmdOrCtrl+U',
         click(item, focusedWindow) {
 
-          if (global.snappy_gui.UIWindow.win) {
+          if (global.snappy_gui.UIWindow.win &&
+            !global.snappy_gui.UIWindow.win.isDestroyed()) {
             debug("Focusing")
             global.snappy_gui.UIWindow.win.focus()
           } else {
