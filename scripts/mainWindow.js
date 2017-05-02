@@ -494,8 +494,10 @@ var mainWindow = {
           ],
           "defaultId": 0,
           "title": "No Server found",
-          "message": "No server found at " + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT
+          "message": "No server found at " + global.snappy_gui.client_IP + ":" + global.snappy_gui.client_PORT + "\n\nPlease restart this software"
         }, function(res) {
+          delete global.snappy_gui.config.same_server;
+          global.snappy_gui.saveConfig()
           process.exit()
         })
       } else {
