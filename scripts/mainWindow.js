@@ -560,7 +560,8 @@ var mainWindow = {
         menuTemplate = x
       }
 
-      menuTemplate[2].submenu[1].checked = (global.snappy_gui.config.same_server !== null) ? true : false
+      menuTemplate[2].submenu[1].checked = (global.snappy_gui.config.same_server == null ||
+        global.snappy_gui.config.same_server == undefined) ? false : true
 
 
       var menu = Menu.buildFromTemplate(menuTemplate)
