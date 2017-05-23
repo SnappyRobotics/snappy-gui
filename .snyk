@@ -5,4 +5,4 @@ ignore: {}
 patch:
   'npm:ms:20170412':
     - electron > extract-zip > debug > ms:
-        patched: '2017-05-23T00:37:36.867Z'
+        patched: '2017-05-23T00:46:27.058Z'
