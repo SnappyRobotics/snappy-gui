@@ -13,7 +13,8 @@
     "package-linux": "electron-packager . --overwrite --asar=false --platform=linux --arch=x64 --icon=data/logo/512x512.png --prune=true --out=release-builds",
     "package-all": "electron-packager . --all",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepublish": "npm run snyk-protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -46,12 +47,12 @@
     "node-cleanup": "^2.1.2",
     "nodemon": "^1.11.0",
     "req-fast": "^0.2.17",
-    "serialport": "^4.0.7",
+    "serialport": "^6.0.0",
     "snappy-core": "github:snappyrobotics/snappy-core",
     "unirest": "^0.5.1",
     "userhome": "^1.0.0",
     "when": "^3.7.8",
-    "snyk": "^1.42.3"
+    "snyk": "^1.83.0"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.24.0",
