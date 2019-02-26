@@ -49,7 +49,7 @@
     "req-fast": "^0.2.17",
     "serialport": "^4.0.7",
     "snappy-core": "github:snappyrobotics/snappy-core",
-    "unirest": "^0.5.1",
+    "unirest": "^0.6.0",
     "userhome": "^1.0.0",
     "when": "^3.7.8",
     "snyk": "^1.85.0"
