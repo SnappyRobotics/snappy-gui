@@ -52,7 +52,7 @@
     "unirest": "^0.5.1",
     "userhome": "^1.0.0",
     "when": "^3.7.8",
-    "snyk": "^1.85.0"
+    "snyk": "^1.232.0"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.24.0",
