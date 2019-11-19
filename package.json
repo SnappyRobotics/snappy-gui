@@ -41,7 +41,7 @@
     "bluebird": "^3.5.0",
     "bower": "^1.8.0",
     "debug": "^2.6.3",
-    "electron": "^1.6.2",
+    "electron": "^5.0.0",
     "ip": "^1.1.5",
     "netmask": "^1.0.6",
     "node-cleanup": "^2.1.2",
